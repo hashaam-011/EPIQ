@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>EPIQ Billing Solutions</title>
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+
+  <!-- Favicons -->
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/" rel="preconnect">
+  <link href="https://fonts.gstatic.com/" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Nunito:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="assets/css/main3860.css?v=1" rel="stylesheet">
+
+  <style>
+    /* Popup Overlay */
+    .popup-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      overflow-y: auto;
+    }
+
+    /* Popup Content (Contact Details) */
+    .popup-content {
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 12px;
+      text-align: left;
+      max-width: 450px;
+      width: 100%;
+      font-family: 'Inter', sans-serif;
+      position: relative;
+      margin: 20px 0;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+      border: 1px solid #e5e7eb;
+    }
+
+    /* Close Button */
+    .popup-close {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-size: 24px;
+      color: #6b7280;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+
+    .popup-close:hover {
+      color: #1f2937;
+    }
+
+    .popup-content h2 {
+      color: #4b3bff;
+      font-size: 26px;
+      font-weight: 600;
+      margin-bottom: 25px;
+      text-align: center;
+      line-height: 1.3;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      color: #374151;
+      margin-bottom: 8px;
+    }
+
+    .form-group label span {
+      color: #ef4444;
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="email"],
+    .form-group input[type="tel"] {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 14px;
+      color: #1f2937;
+      background-color: #f9fafb;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .form-group input:focus {
+      border-color: #4b3bff;
+      box-shadow: 0 0 0 3px rgba(75, 59, 255, 0.1);
+      outline: none;
+    }
+
+    .checkbox-group {
+      margin: 20px 0;
+    }
+
+    .checkbox-group label {
+      display: flex;
+      align-items: center;
+      font-size: 13px;
+      color: #4b5563;
+      margin-bottom: 12px;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      margin-right: 10px;
+      accent-color: #4b3bff;
+    }
+
+    .terms-text {
+      font-size: 11px;
+      color: #6b7280;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .terms-text a {
+      color: #4b3bff;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+
+    .terms-text a:hover {
+      color: #3a2ecc;
+    }
+
+    .button-group {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 25px;
+    }
+
+    .skip-btn {
+      background: none;
+      border: none;
+      color: #4b3bff;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+
+    .skip-btn:hover {
+      color: #3a2ecc;
+    }
+
+    .continue-btn {
+      background-color: #4b3bff;
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 25px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.1s ease;
+    }
+
+    .continue-btn:hover {
+      background-color: #3a2ecc;
+      transform: translateY(-1px);
+    }
+
+    .continue-btn:active {
+      transform: translateY(0);
+    }
+
+    /* Terms Popup */
+    #termsPopup {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      justify-content: center;
+      align-items: center;
+      z-index: 1001;
+      overflow-y: auto;
+    }
+
+    .terms-content {
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 12px;
+      max-width: 600px;
+      width: 100%;
+      max-height: 85vh;
+      overflow-y: auto;
+      position: relative;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+      border: 1px solid #e5e7eb;
+      font-family: 'Inter', sans-serif;
+      margin: 20px 0;
+    }
+
+    .terms-close {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-size: 24px;
+      color: #6b7280;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+
+    .terms-close:hover {
+      color: #1f2937;
+    }
+
+    .terms-content h2 {
+      font-size: 24px;
+      font-weight: 600;
+      color: #1f2937;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .terms-content p {
+      font-size: 14px;
+      color: #4b5563;
+      line-height: 1.8;
+      margin-bottom: 15px;
+    }
+
+    .terms-content h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1f2937;
+      margin-top: 25px;
+      margin-bottom: 10px;
+    }
+
+    .terms-content ul {
+      list-style-type: disc;
+      margin-left: 20px;
+      margin-bottom: 15px;
+    }
+
+    .terms-content ul li {
+      font-size: 14px;
+      color: #4b5563;
+      line-height: 1.8;
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+
+<body class="index-page">
+
+  <!-- Popup Modal -->
+  <div id="popup" class="popup-overlay">
+    <div class="popup-content">
+      <span class="popup-close" onclick="closePopup()">×</span>
+      <h2>Please Provide Your <br> contact details</h2>
+      <form>
+        <div class="form-group">
+          <label for="first-name">First name<span>*</span></label>
+          <input type="text" id="first-name" placeholder="First Name ">
+        </div>
+        <div class="form-group">
+          <label for="last-name">Last name</label>
+          <input type="text" id="last-name" placeholder="Last Name ">
+        </div>
+        <div class="form-group">
+          <label for="email">Email<span>*</span></label>
+          <input type="email" id="email" placeholder="example@smsoptin.com">
+        </div>
+        <div class="form-group">
+          <label for="phone">Phone number</label>
+          <input type="tel" id="phone" placeholder="+1234567891">
+        </div>
+        <div class="checkbox-group">
+          <label>
+            <input type="checkbox">
+            I would like to receive offers and news
+          </label>
+          <label>
+            <input type="checkbox">
+            I accept the <a onclick="showTerms()">Terms of Service & Privacy Policy</a>
+          </label>
+        </div>
+        <div class="terms-text">
+          By providing your phone number, you agree to receive informational text messages from [Business Name]. Consent is not a condition of purchase. Message frequency will vary. Msg & data rates may apply. Reply HELP for help or STOP to cancel.
+        </div>
+        <div class="button-group">
+          <button type="button" class="skip-btn" onclick="closePopup()">SKIP</button>
+          <button type="submit" class="continue-btn">CONTINUE</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Terms and Conditions Popup -->
+  <div id="termsPopup" class="popup-overlay">
+    <div class="terms-content">
+      <span class="terms-close" onclick="closeTerms()">×</span>
+      <h2>Terms of Service & Privacy Policy</h2>
+      <div id="termsContent"></div>
+    </div>
+  </div>
+
+  <header id="header" class="header d-flex align-items-center fixed-top">
+    <div class="container-fluid container-xl position-relative d-flex align-items-center">
+      <a href="index-2.html" class="logo d-flex align-items-center me-auto">
+        <img src="assets/img/epiq-logo.png" alt="">
+      </a>
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="index-2.html#hero" class="active">Home</a></li>
+          <li><a href="index-2.html#about">About</a></li>
+          <li><a href="index-2.html#services">Services</a></li>
+          <li><a href="index-2.html#contact">Contact</a></li>
+        </ul>
+        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+      </nav>
+      <a class="btn-getstarted" href="index-2.html#about">Login</a>
+    </div>
+  </header>
+
+  <main class="main">
+    <!-- Hero Section -->
+    <section id="hero" class="hero section">
+      <div class="hero-bg">
+        <img src="assets/img/hero-bg-light.webp" alt="">
+      </div>
+      <div class="container text-center">
+        <div class="d-flex flex-column justify-content-center align-items-center">
+          <h1 data-aos="fade-up">Simplifying Health Billing, Empowering Care</h1>
+          <p data-aos="fade-up" data-aos-delay="100">Effortless billing solutions tailored for home health agencies, Medicare, and commercial claims.<br></p>
+          <div class="d-flex" data-aos="fade-up" data-aos-delay="200">
+            <a href="#about" class="btn-get-started">Get Started</a>
+          </div>
+          <img src="assets/img/header.png" class="img-fluid hero-img" alt="" data-aos="zoom-out" data-aos-delay="300">
+        </div>
+      </div>
+    </section><!-- /Hero Section -->
+
+    <!-- Featured Services Section -->
+    <section id="featured-services" class="featured-services section light-background">
+      <div class="container">
+        <div class="row gy-4">
+          <div class="col-xl-4 col-lg-6" data-aos="fade-up" data-aos-delay="100">
+            <div class="service-item d-flex">
+              <div class="icon flex-shrink-0"><i class="bi bi-briefcase"></i></div>
+              <div>
+                <h4 class="title"><a href="#" class="stretched-link">Billing service for home health agencies nationwide</a></h4>
+                <p class="description">Complete billing services to ensure accurate claims and faster reimbursements nationwide.
+                  Our team takes care of the entire billing process, letting you focus on patient care. With our expertise, we minimize errors and ensure a smooth revenue cycle.</p>
+              </div>
+            </div>
+          </div>
+          <!-- End Service Item -->
+
+          <div class="col-xl-4 col-lg-6" data-aos="fade-up" data-aos-delay="200">
+            <div class="service-item d-flex">
+              <div class="icon flex-shrink-0"><i class="bi bi-card-checklist"></i></div>
+              <div>
+                <h4 class="title"><a href="#" class="stretched-link">Commercial and Medicare</a></h4>
+                <p class="description">Expert handling of insurance and Medicare claims to maximize reimbursements.
+                  We navigate complex regulations to minimize denials and delays. Our tailored approach ensures compliance with all billing requirements.</p>
+              </div>
+            </div>
+          </div><!-- End Service Item -->
+
+          <div class="col-xl-4 col-lg-6" data-aos="fade-up" data-aos-delay="300">
+            <div class="service-item d-flex">
+              <div class="icon flex-shrink-0"><i class="bi bi-bar-chart"></i></div>
+              <div>
+                <h4 class="title"><a href="#" class="stretched-link">Review choice demonstration submission</a></h4>
+                <p class="description">Simplified, compliant RCD submissions for timely approvals.
+                  We ensure all documentation meets Medicare standards for seamless processing. Our services reduce administrative burden, allowing you to focus on growth.</p>
+              </div>
+            </div>
+          </div><!-- End Service Item -->
+        </div>
+      </div>
+    </section><!-- /Featured Services Section -->
+
+    <!-- About Section -->
+    <section id="about" class="about section">
+      <div class="container">
+        <div class="row gy-4">
+          <div class="col-lg-6 content" data-aos="fade-up" data-aos-delay="100">
+            <p class="who-we-are">Who We Are</p>
+            <h3>Your Trusted Partner in Health Billing solutions</h3>
+            <p>
+              We are dedicated to providing reliable, accurate, and efficient billing services tailored to the unique needs of home health agencies nationwide. With expertise in handling commercial insurance, Medicare claims, and Review Choice Demonstration (RCD) submissions, we simplify complex processes and maximize reimbursements for our clients.
+            </p><p>
+              Our mission is to empower healthcare providers by streamlining billing operations, so they can focus on delivering exceptional care. Backed by a team of experienced professionals and a commitment to excellence, we strive to be your trusted partner in navigating the ever-changing healthcare landscape.
+            </p>
+          </div>
+          <div class="col-lg-6 about-images" data-aos="fade-up" data-aos-delay="200">
+            <div class="row gy-4">
+              <div class="col-lg-6">
+                <img src="assets/img/about-company-1.jpg" class="img-fluid" alt="">
+              </div>
+              <div class="col-lg-6">
+                <div class="row gy-4">
+                  <div class="col-lg-12">
+                    <img src="assets/img/about-company-2.jpg" class="img-fluid" alt="">
+                  </div>
+                  <div class="col-lg-12">
+                    <img src="assets/img/about-company-3.jpg" class="img-fluid" alt="">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section><!-- /About Section -->
+
+    <!-- Clients Section -->
+    <section id="clients" class="clients section">
+      <div class="container section-title" data-aos="fade-up">
+        <h2>Our Pride</h2>
+        <p>Proud Partners</p>
+      </div><!-- End Section Title -->
+      <div class="container" data-aos="fade-up">
+        <div class="row gy-4">
+          <div class="col-xl-2 col-md-3 col-6 client-logo">
+            <img src="assets/img/clients/client-1.png" class="img-fluid" alt="">
+          </div><!-- End Client Item -->
+          <div class="col-xl-2 col-md-3 col-6 client-logo">
+            <img src="assets/img/clients/client-2.png" class="img-fluid" alt="">
+          </div><!-- End Client Item -->
+          <div class="col-xl-2 col-md-3 col-6 client-logo">
+            <img src="assets/img/clients/client-3.png" class="img-fluid" alt="">
+          </div><!-- End Client Item -->
+          <div class="col-xl-2 col-md-3 col-6 client-logo">
+            <img src="assets/img/clients/client-4.png" class="img-fluid" alt="">
+          </div><!-- End Client Item -->
+          <div class="col-xl-2 col-md-3 col-6 client-logo">
+            <img src="assets/img/clients/client-5.png" class="img-fluid" alt="">
+          </div><!-- End Client Item -->
+          <div class="col-xl-2 col-md-3 col-6 client-logo">
+            <img src="assets/img/clients/client-6.png" class="img-fluid" alt="">
+          </div><!-- End Client Item -->
+        </div>
+      </div>
+    </section><!-- /Clients Section -->
+
+    <!-- Services Section -->
+    <section id="services" class="services section light-background">
+      <div class="container section-title" data-aos="fade-up">
+        <h2>Services</h2>
+        <p>Our Professional Billing Services</p>
+      </div><!-- End Section Title -->
+      <div class="container">
+        <div class="row g-5">
+          <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
+            <div class="service-item item-cyan position-relative">
+              <i class="bi bi-activity icon"></i>
+              <div>
+                <h3>Billing service for home health agencies nationwide</h3>
+                <p>Streamline your revenue cycle with our expert billing services, tailored specifically for home health agencies. We handle everything from claims submission to reimbursement, ensuring accuracy and efficiency.</p>
+                <a href="#" class="read-more stretched-link">Learn More <i class="bi bi-arrow-right"></i></a>
+              </div>
+            </div>
+          </div><!-- End Service Item -->
+          <div class="col-lg-6" data-aos="fade-up" data-aos-delay="200">
+            <div class="service-item item-orange position-relative">
+              <i class="bi bi-broadcast icon"></i>
+              <div>
+                <h3>Commercial and Medicare</h3>
+                <p>Navigate the complexities of commercial insurance and Medicare billing with ease. Our team ensures precise claim submissions and maximized reimbursements, reducing errors and delays.</p>
+                <a href="#" class="read-more stretched-link">Learn More <i class="bi bi-arrow-right"></i></a>
+              </div>
+            </div>
+          </div><!-- End Service Item -->
+          <div class="col-lg-6" data-aos="fade-up" data-aos-delay="300">
+            <div class="service-item item-teal position-relative">
+              <i class="bi bi-easel icon"></i>
+              <div>
+                <h3>Review choice demonstration submission</h3>
+                <p>Ensure compliance and approval with our dedicated RCD submission services. We manage pre-claim reviews and documentation, minimizing delays and simplifying the process for your agency.</p>
+                <a href="#" class="read-more stretched-link">Learn More <i class="bi bi-arrow-right"></i></a>
+              </div>
+            </div>
+          </div><!-- End Service Item -->
+        </div>
+      </div>
+    </section><!-- /Services Section -->
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact section">
+      <div class="container section-title" data-aos="fade-up">
+        <h2>Contact</h2>
+        <p>Get in Touch with Us</p>
+      </div><!-- End Section Title -->
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+        <div class="row gy-4">
+          <div class="col-lg-6">
+            <div class="info-item d-flex flex-column justify-content-center align-items-center" data-aos="fade-up" data-aos-delay="200">
+              <i class="bi bi-geo-alt"></i>
+              <h3>Address</h3>
+              <p>132 W International Speedway Blvd, #1089
+                Daytona Beach,FL 32114 NY 535022</p>
+            </div>
+          </div><!-- End Info Item -->
+          <div class="col-lg-3 col-md-6">
+            <div class="info-item d-flex flex-column justify-content-center align-items-center" data-aos="fade-up" data-aos-delay="300">
+              <i class="bi bi-telephone"></i>
+              <h3>Call Us</h3>
+              <p>+888-977-9495</p>
+            </div>
+          </div><!-- End Info Item -->
+          <div class="col-lg-3 col-md-6">
+            <div class="info-item d-flex flex-column justify-content-center align-items-center" data-aos="fade-up" data-aos-delay="400">
+              <i class="bi bi-envelope"></i>
+              <h3>Email Us</h3>
+              <p>info@example.com</p>
+            </div>
+          </div><!-- End Info Item -->
+        </div>
+        <div class="row gy-4 mt-1">
+          <div class="col-lg-6" data-aos="fade-up" data-aos-delay="300">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d48389.78314118045!2d-81.020615!3d29.212661!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x88e6da288151903b:0x27d8203cdbd01020!2s132%20W%20International%20Speedway%20Blvd%20%231089%2C%20Daytona%20Beach%2C%20FL%20%2032114!5e0!3m2!1sen!2sus!4v1676961268712!5m2!1sen!2sus" frameborder="0" style="border:0; width: 100%; height: 400px;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          </div><!-- End Google Maps -->
+          <div class="col-lg-6">
+            <form action="https://test-website-c268f.web.app/forms/contact.php" method="post" class="php-email-form" data-aos="fade-up" data-aos-delay="400">
+              <div class="row gy-4">
+                <div class="col-md-6">
+                  <input type="text" name="name" class="form-control" placeholder="Your Name" required="">
+                </div>
+                <div class="col-md-6 ">
+                  <input type="email" class="form-control" name="email" placeholder="Your Email" required="">
+                </div>
+                <div class="col-md-12">
+                  <input type="text" class="form-control" name="subject" placeholder="Subject" required="">
+                </div>
+                <div class="col-md-12">
+                  <textarea class="form-control" name="message" rows="6" placeholder="Message" required=""></textarea>
+                </div>
+                <div class="col-md-12 text-center">
+                  <div class="loading">Loading</div>
+                  <div class="error-message"></div>
+                  <div class="sent-message">Your message has been sent. Thank you!</div>
+                  <button type="submit">Send Message</button>
+                </div>
+              </div>
+            </form>
+          </div><!-- End Contact Form -->
+        </div>
+      </div>
+    </section><!-- /Contact Section -->
+  </main>
+
+  <footer id="footer" class="footer position-relative light-background">
+    <div class="container footer-top">
+      <div class="row gy-4">
+        <div class="col-lg-4 col-md-6 footer-about">
+          <a href="index-2.html" class="logo d-flex align-items-center">
+            <span class="sitename">EPIQ Billing Solutions</span>
+          </a>
+          <div class="footer-contact pt-3">
+            <p>132 W International Speedway Blvd, #1089
+              Daytona Beach, FL 32114</p>
+            <p>New York, NY 535022</p>
+            <p class="mt-3"><strong>Phone:</strong> <span>+888-977-9495</span></p>
+            <p><strong>Email:</strong> <span>info@example.com</span></p>
+          </div>
+          <div class="social-links d-flex mt-4">
+            <a href="#"><i class="bi bi-twitter-x"></i></a>
+            <a href="#"><i class="bi bi-facebook"></i></a>
+            <a href="#"><i class="bi bi-instagram"></i></a>
+            <a href="#"><i class="bi bi-linkedin"></i></a>
+          </div>
+        </div>
+        <div class="col-lg-2 col-md-3 footer-links">
+          <h4>Useful Links</h4>
+          <ul>
+            <li><a href="#">Home</a></li>
+            <li><a href="#">About us</a></li>
+            <li><a href="#">Services</a></li>
+            <li><a href="#">Terms of service</a></li>
+            <li><a href="#">Privacy policy</a></li>
+          </ul>
+        </div>
+        <div class="col-lg-2 col-md-3 footer-links">
+          <h4>Our Services</h4>
+          <ul>
+            <li><a href="#">Billing service for home health agencies nationwide</a></li>
+            <li><a href="#">Commercial and Medicare</a></li>
+            <li><a href="#">Review choice demonstration submission</a></li>
+          </ul>
+        </div>
+        <div class="col-lg-4 col-md-12 footer-newsletter">
+          <h4>Our Newsletter</h4>
+          <p>Subscribe to our newsletter and receive the latest news about our products and services!</p>
+          <form action="https://test-website-c268f.web.app/forms/newsletter.php" method="post" class="php-email-form">
+            <div class="newsletter-form"><input type="email" name="email"><input type="submit" value="Subscribe"></div>
+            <div class="loading">Loading</div>
+            <div class="error-message"></div>
+            <div class="sent-message">Your subscription request has been sent. Thank you!</div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scroll Top -->
+  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Preloader -->
+  <div id="preloader"></div>
+
+  <!-- Vendor JS Files -->
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/php-email-form/validate.js"></script>
+  <script src="assets/vendor/aos/aos.js"></script>
+  <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+
+  <!-- Main JS File -->
+  <script src="assets/js/main.js"></script>
+
+  <!-- Script for Popup -->
+  <script>
+    // Function to show the popup
+    window.onload = function() {
+      const popup = document.getElementById('popup');
+      popup.style.display = 'flex';
+      // Automatically close the popup after 10 seconds
+      setTimeout(() => {
+        popup.style.display = 'none';
+      }, 10000);
+    }
+
+    // Function to close the popup
+    function closePopup() {
+      document.getElementById('popup').style.display = 'none';
+    }
+
+    // Function to show the Terms and Conditions popup
+    function showTerms() {
+      const termsPopup = document.getElementById('termsPopup');
+      const termsContent = document.getElementById('termsContent');
+
+      // Fetch the content of t&c.txt
+      fetch('/t&c.txt')
+        .then(response => response.text())
+        .then(data => {
+          // Split the text into lines for processing
+          const lines = data.split('\n');
+          let htmlContent = '';
+
+          lines.forEach(line => {
+            line = line.trim();
+            if (!line) return; // Skip empty lines
+
+            // Detect headings (e.g., lines starting with a number followed by a dot, or all caps)
+            if (/^\d+\./.test(line) || line === line.toUpperCase()) {
+              htmlContent += `<h3>${line}</h3>`;
+            }
+            // Detect list items (e.g., lines starting with a dash or bullet)
+            else if (line.startsWith('-') || line.startsWith('*')) {
+              if (!htmlContent.includes('<ul>')) {
+                htmlContent += '<ul>';
+              }
+              htmlContent += `<li>${line.substring(1).trim()}</li>`;
+            }
+            // Close the list if the next line is not a list item
+            else if (htmlContent.includes('<ul>') && !line.startsWith('-') && !line.startsWith('*')) {
+              htmlContent += '</ul>';
+              htmlContent += `<p>${line}</p>`;
+            }
+            // Treat as a paragraph
+            else {
+              htmlContent += `<p>${line}</p>`;
+            }
+          });
+
+          // Close any open lists
+          if (htmlContent.includes('<ul>')) {
+            htmlContent += '</ul>';
+          }
+
+          termsContent.innerHTML = htmlContent;
+          termsPopup.style.display = 'flex';
+        })
+        .catch(error => {
+          termsContent.innerHTML = '<p style="color: #ef4444;">Error loading Terms and Conditions. Please try again later.</p>';
+          termsPopup.style.display = 'flex';
+          console.error('Error fetching t&c.txt:', error);
+        });
+    }
+
+    // Function to close the Terms and Conditions popup
+    function closeTerms() {
+      document.getElementById('termsPopup').style.display = 'none';
+    }
+  </script>
+
+</body>
+</html>
