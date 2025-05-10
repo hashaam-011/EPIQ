@@ -650,10 +650,6 @@
     window.onload = function() {
       const popup = document.getElementById('popup');
       popup.style.display = 'flex';
-      // Automatically close the popup after 10 seconds
-      setTimeout(() => {
-        popup.style.display = 'none';
-      }, 10000);
     }
 
     // Function to close the popup
@@ -719,6 +715,16 @@
     function closeTerms() {
       document.getElementById('termsPopup').style.display = 'none';
     }
+
+    // Add click event listener to login button
+    document.addEventListener('DOMContentLoaded', function() {
+      const loginBtn = document.querySelector('.btn-getstarted');
+      loginBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const popup = document.getElementById('popup');
+        popup.style.display = 'flex';
+      });
+    });
   </script>
 
 </body>
