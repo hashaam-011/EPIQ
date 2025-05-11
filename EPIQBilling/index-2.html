@@ -276,49 +276,6 @@
 
 <body class="index-page">
 
-  <!-- Popup Modal -->
-  <div id="popup" class="popup-overlay">
-    <div class="popup-content">
-      <span class="popup-close" onclick="closePopup()">×</span>
-      <h2>Please Provide Your <br> contact details</h2>
-      <form>
-        <div class="form-group">
-          <label for="first-name">First name<span>*</span></label>
-          <input type="text" id="first-name" placeholder="First Name ">
-        </div>
-        <div class="form-group">
-          <label for="last-name">Last name</label>
-          <input type="text" id="last-name" placeholder="Last Name ">
-        </div>
-        <div class="form-group">
-          <label for="email">Email<span>*</span></label>
-          <input type="email" id="email" placeholder="example@smsoptin.com">
-        </div>
-        <div class="form-group">
-          <label for="phone">Phone number</label>
-          <input type="tel" id="phone" placeholder="+1234567891">
-        </div>
-        <div class="checkbox-group">
-          <label>
-            <input type="checkbox">
-            I would like to receive offers and news
-          </label>
-          <label>
-            <input type="checkbox">
-            I accept the <a onclick="showTerms()">Terms of Service & Privacy Policy</a>
-          </label>
-        </div>
-        <div class="terms-text">
-          By providing your phone number, you agree to receive informational text messages from [Business Name]. Consent is not a condition of purchase. Message frequency will vary. Msg & data rates may apply. Reply HELP for help or STOP to cancel.
-        </div>
-        <div class="button-group">
-          <button type="button" class="skip-btn" onclick="closePopup()">SKIP</button>
-          <button type="submit" class="continue-btn">CONTINUE</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
   <!-- Terms and Conditions Popup -->
   <div id="termsPopup" class="popup-overlay">
     <div class="terms-content">
@@ -339,6 +296,7 @@
           <li><a href="index-2.html#about">About</a></li>
           <li><a href="index-2.html#services">Services</a></li>
           <li><a href="index-2.html#contact">Contact</a></li>
+          <li><a href="user-management.html" target="_blank">User Management</a></li>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>
