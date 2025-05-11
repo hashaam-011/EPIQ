@@ -27,6 +27,9 @@
       background: rgba(0, 0, 0, 0.6);
       z-index: 1;
     }
+    body.dashboard-active::before {
+      display: none; /* Hide dark overlay when dashboard is active */
+    }
     .login-container {
       position: relative;
       z-index: 2;
@@ -111,61 +114,73 @@
     .input-group .form-control:focus {
       border-left: none;
     }
-    /* Make dashboard containers full width and height after login */
-    #superadmin-dashboard, #admin-dashboard, #user-management-ui {
-      max-width: none !important;
-      width: 100vw;
-      min-height: 100vh;
-      margin: 0 !important;
-      padding: 0 0 40px 0 !important;
-      background: rgba(255,255,255,0.97);
-      border-radius: 0;
-      box-shadow: none;
-      position: relative;
-      z-index: 2;
-      display: block;
+    /* Dashboard Styles */
+    #superadmin-dashboard, #admin-dashboard {
+      display: none;
+      position: fixed;
       top: 0;
-    }
-    .dashboard-container {
+      left: 0;
+      width: 100vw;
       min-height: 100vh;
       background: #f8f9fa;
-      width: 100vw;
-      max-width: 1200px;
-      margin: 0 auto !important;
-      padding: 32px 32px 40px 32px;
+      margin: 0 !important;
+      padding: 0 !important;
+      z-index: 1000;
+      overflow-y: auto;
       box-sizing: border-box;
-      border-radius: 18px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+    }
+    .dashboard-container {
+      max-width: 1400px;
+      margin: 20px auto;
+      padding: 30px;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+      min-height: calc(100vh - 40px);
+    }
+    #create-admin-container, #create-user-container {
+      display: none !important;
     }
     .stat-card {
-      border-radius: 10px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-      transition: transform 0.3s ease;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      margin-bottom: 20px;
     }
     .stat-card:hover {
-      transform: translateY(-5px);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
     }
     .card {
       border: none;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
       border-radius: 10px;
     }
     .card-header {
-      border-bottom: 1px solid rgba(0,0,0,0.05);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     }
     .table {
+      background: #ffffff;
+      border-radius: 8px;
+      overflow: hidden;
       margin: 0;
     }
     .table th {
+      background: #f1f3f5;
       font-weight: 600;
-      background: #f8f9fa;
+      padding: 12px;
+    }
+    .table td {
+      padding: 12px;
+      vertical-align: middle;
     }
     .btn-primary {
       background: #4a90e2;
       border: none;
-      padding: 8px 16px;
+      padding: 10px 20px;
       border-radius: 6px;
-      transition: all 0.3s ease;
+      font-weight: 500;
+      transition: all 0.2s ease;
     }
     .btn-primary:hover {
       background: #357abd;
@@ -176,26 +191,58 @@
     }
     @media (max-width: 1200px) {
       .dashboard-container {
-        max-width: 100vw;
-        padding: 16px 4px 24px 4px;
-        border-radius: 0;
+        max-width: 95vw;
+        padding: 15px;
       }
     }
     @media (max-width: 768px) {
+      .dashboard-container {
+        padding: 10px;
+        margin: 10px;
+      }
       .stat-card {
         margin-bottom: 15px;
       }
-      .dashboard-container {
-        padding: 8px 0 16px 0;
-        border-radius: 0;
+      .table th, .table td {
+        padding: 8px;
+        font-size: 0.9rem;
       }
-      #superadmin-dashboard, #admin-dashboard, #user-management-ui {
-        padding: 0 0 24px 0 !important;
+      #superadmin-dashboard, #admin-dashboard {
+        padding: 0 !important;
       }
+    }
+    /* Slide-down form styles */
+    .slide-down-form {
+      display: none;
+      overflow: hidden;
+      transition: max-height 0.5s cubic-bezier(0.4,0,0.2,1);
+      max-height: 0;
+      margin-bottom: 20px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      padding: 0;
+    }
+    .slide-down-form.show {
+      display: block;
+      max-height: 800px;
+      padding: 20px;
+    }
+    .checkmark-success {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 80px;
+    }
+    .checkmark-success svg {
+      width: 60px;
+      height: 60px;
+      display: block;
     }
   </style>
 </head>
 <body>
+  <!-- Login Container -->
   <div class="login-container" id="login-container">
     <div class="login-icon">
       <img src="assets/img/epiq-logo.png" alt="EPIQ Logo">
@@ -233,6 +280,7 @@
       <i class="bi bi-arrow-left me-2"></i>Back to Home
     </a>
   </div>
+  <!-- Submission Container -->
   <div class="login-container shadow-lg rounded bg-white" id="submission-container" style="display:none;">
     <h2 class="login-title">Submit Data</h2>
     <form id="submissionForm">
@@ -242,56 +290,9 @@
       </div>
       <button type="submit" class="btn btn-success w-100">Submit</button>
     </form>
-    <button onclick="window.location.reload()" class="btn btn-outline-secondary w-100 mt-3">&larr; Back</button>
+    <button onclick="window.location.reload()" class="btn btn-outline-secondary w-100 mt-3">← Back</button>
   </div>
-  <div class="login-container shadow-lg rounded bg-white" id="create-admin-container" style="display:none;">
-    <h2 class="login-title">Create Admin</h2>
-    <form id="createAdminForm">
-      <div class="form-group">
-        <label for="admin-first-name">First Name</label>
-        <input type="text" class="form-control" id="admin-first-name" required>
-      </div>
-      <div class="form-group">
-        <label for="admin-last-name">Last Name</label>
-        <input type="text" class="form-control" id="admin-last-name">
-      </div>
-      <div class="form-group">
-        <label for="admin-email">Email</label>
-        <input type="email" class="form-control" id="admin-email" required>
-      </div>
-      <div class="form-group">
-        <label for="admin-password">Password</label>
-        <input type="password" class="form-control" id="admin-password" required>
-      </div>
-      <button type="submit" class="btn btn-warning w-100">Create Admin</button>
-    </form>
-    <button onclick="window.location.reload()" class="btn btn-outline-secondary w-100 mt-3">&larr; Back</button>
-    <div id="superadmin-dashboard" class="mt-4"></div>
-  </div>
-  <div class="login-container shadow-lg rounded bg-white" id="create-user-container" style="display:none;">
-    <h2 class="login-title">Create User (Limit: 4)</h2>
-    <form id="createUserForm">
-      <div class="form-group">
-        <label for="user-first-name">First Name</label>
-        <input type="text" class="form-control" id="user-first-name" required>
-      </div>
-      <div class="form-group">
-        <label for="user-last-name">Last Name</label>
-        <input type="text" class="form-control" id="user-last-name">
-      </div>
-      <div class="form-group">
-        <label for="user-email">Email</label>
-        <input type="email" class="form-control" id="user-email" required>
-      </div>
-      <div class="form-group">
-        <label for="user-password">Password</label>
-        <input type="password" class="form-control" id="user-password" required>
-      </div>
-      <button type="submit" class="btn btn-info w-100">Create User</button>
-    </form>
-    <button onclick="window.location.reload()" class="btn btn-outline-secondary w-100 mt-3">&larr; Back</button>
-    <div id="admin-dashboard" class="mt-4"></div>
-  </div>
+  <!-- User Dashboard Container -->
   <div class="login-container shadow-lg rounded bg-white" id="user-dashboard-container" style="display:none;">
     <h2 class="login-title">User Dashboard</h2>
     <div class="mb-4">
@@ -302,8 +303,12 @@
       <button class="btn btn-outline-primary me-2 mb-2" onclick="showForm('final_billing_audit')">Final Billing Audit (PDGM)</button>
     </div>
     <div id="user-form-area"></div>
-    <button onclick="window.location.reload()" class="btn btn-outline-secondary w-100 mt-3">&larr; Back</button>
+    <button onclick="window.location.reload()" class="btn btn-outline-secondary w-100 mt-3">← Back</button>
   </div>
+  <!-- Dashboard Containers -->
+  <div id="superadmin-dashboard" style="display:none;"></div>
+  <div id="admin-dashboard" style="display:none;"></div>
+  <!-- User Management UI -->
   <div class="container-fluid px-4" id="user-management-ui" style="display:none;">
     <h2 class="fw-bold mt-4 mb-3">User Management</h2>
     <div class="row mb-4">
@@ -370,7 +375,7 @@
       <nav><ul class="pagination mb-0"><li class="page-item active"><a class="page-link" href="#">1</a></li><li class="page-item"><a class="page-link" href="#">2</a></li></ul></nav>
     </div>
   </div>
-  <!-- Bootstrap Modal for Login Feedback -->
+  <!-- Modals -->
   <div class="modal fade" id="loginFeedbackModal" tabindex="-1" aria-labelledby="loginFeedbackModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
@@ -382,19 +387,98 @@
       </div>
     </div>
   </div>
+  <div class="modal fade" id="editFormModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Edit Form</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="edit-form-id">
+          <div class="mb-3">
+            <label class="form-label">Form Data (JSON)</label>
+            <textarea class="form-control" id="edit-form-data" rows="10"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" onclick="saveFormEdit()">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="editUserModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Edit User</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="edit-user-id">
+          <div class="mb-3">
+            <label class="form-label">First Name</label>
+            <input type="text" class="form-control" id="edit-first-name">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Last Name</label>
+            <input type="text" class="form-control" id="edit-last-name">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" id="edit-email">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Role</label>
+            <select class="form-control" id="edit-role">
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
+              <option value="superadmin">Super Admin</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" onclick="saveUserEdit()">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script>
     let loggedInUser = null;
+
     function showLoginFeedback(message, isSuccess) {
       const modal = new bootstrap.Modal(document.getElementById('loginFeedbackModal'));
-      document.getElementById('loginFeedbackMessage').innerHTML = `<span class='${isSuccess ? 'text-success' : 'text-danger'}'>${message}</span>`;
-      modal.show();
+      if (isSuccess) {
+        document.getElementById('loginFeedbackMessage').innerHTML = `
+          <div class='checkmark-success'>
+            <svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="25" fill="none" stroke="#28a745" stroke-width="4"/><path fill="none" stroke="#28a745" stroke-width="4" d="M14 27l7 7 16-16"/></svg>
+          </div>
+          <div class='text-success text-center mt-2'>${message}</div>
+        `;
+        modal.show();
+        setTimeout(() => {
+          modal.hide();
+        }, 1000);
+      } else {
+        document.getElementById('loginFeedbackMessage').innerHTML = `<span class='text-danger'>${message}</span>`;
+        modal.show();
+      }
     }
+
+    function logout() {
+      localStorage.removeItem('loggedInUser');
+      window.location.reload();
+    }
+
     document.getElementById('loginForm').addEventListener('submit', async function(e) {
       e.preventDefault();
       const email = document.getElementById('login-email').value;
       const password = document.getElementById('login-password').value;
       const role = document.getElementById('login-role').value;
+
       try {
         const response = await fetch('http://localhost:3000/api/login', {
           method: 'POST',
@@ -402,33 +486,31 @@
           body: JSON.stringify({ email, password, role })
         });
         const data = await response.json();
+
         if (data.success) {
           showLoginFeedback(`Login successful! Welcome, ${data.user.first_name} (${data.user.role})`, true);
           loggedInUser = data.user;
           localStorage.setItem('loggedInUser', JSON.stringify(data.user));
+
           setTimeout(() => {
+            // Hide login container
             document.getElementById('login-container').style.display = 'none';
-            document.getElementById('submission-container').style.display = 'none';
-            document.getElementById('create-admin-container').style.display = 'none';
-            document.getElementById('create-user-container').style.display = 'none';
-            document.getElementById('user-dashboard-container').style.display = 'none';
-            document.getElementById('user-management-ui').style.display = 'none';
-            document.getElementById('superadmin-dashboard').style.display = 'none';
-            document.getElementById('admin-dashboard').style.display = 'none';
+
+            // Add dashboard-active class to body to hide overlay
+            document.body.classList.add('dashboard-active');
+
+            // Show appropriate dashboard
             if (loggedInUser.role === 'superadmin') {
-              document.getElementById('create-admin-container').style.display = 'block';
               document.getElementById('superadmin-dashboard').style.display = 'block';
               loadSuperAdminDashboard();
             } else if (loggedInUser.role === 'admin') {
-              document.getElementById('create-user-container').style.display = 'block';
               document.getElementById('admin-dashboard').style.display = 'block';
               loadAdminDashboard(loggedInUser.id);
             } else if (loggedInUser.role === 'user') {
               document.getElementById('user-dashboard-container').style.display = 'block';
-            } else {
-              document.getElementById('submission-container').style.display = 'block';
             }
-            window.scrollTo(0,0);
+
+            window.scrollTo(0, 0);
             bootstrap.Modal.getInstance(document.getElementById('loginFeedbackModal')).hide();
           }, 1200);
         } else {
@@ -438,6 +520,7 @@
         showLoginFeedback('Server error. Please try again later.', false);
       }
     });
+
     document.getElementById('submissionForm').addEventListener('submit', async function(e) {
       e.preventDefault();
       const content = document.getElementById('submission-content').value;
@@ -466,73 +549,7 @@
         alert('Server error. Please try again later.');
       }
     });
-    document.getElementById('createAdminForm').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      if (!loggedInUser || loggedInUser.role !== 'superadmin') {
-        alert('Only superadmin can create admins.');
-        return;
-      }
-      const first_name = document.getElementById('admin-first-name').value;
-      const last_name = document.getElementById('admin-last-name').value;
-      const email = document.getElementById('admin-email').value;
-      const password = document.getElementById('admin-password').value;
-      try {
-        const response = await fetch('http://localhost:3000/api/create-admin', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            creator_role: loggedInUser.role,
-            first_name,
-            last_name,
-            email,
-            password
-          })
-        });
-        const data = await response.json();
-        if (data.success) {
-          alert('Admin created successfully!');
-          document.getElementById('createAdminForm').reset();
-        } else {
-          alert('Failed to create admin: ' + data.message);
-        }
-      } catch (err) {
-        alert('Server error. Please try again later.');
-      }
-    });
-    document.getElementById('createUserForm').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      if (!loggedInUser || loggedInUser.role !== 'admin') {
-        alert('Only admin can create users.');
-        return;
-      }
-      const first_name = document.getElementById('user-first-name').value;
-      const last_name = document.getElementById('user-last-name').value;
-      const email = document.getElementById('user-email').value;
-      const password = document.getElementById('user-password').value;
-      try {
-        const response = await fetch('http://localhost:3000/api/create-user', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            creator_role: loggedInUser.role,
-            creator_id: loggedInUser.id,
-            first_name,
-            last_name,
-            email,
-            password
-          })
-        });
-        const data = await response.json();
-        if (data.success) {
-          alert('User created successfully!');
-          document.getElementById('createUserForm').reset();
-        } else {
-          alert('Failed to create user: ' + data.message);
-        }
-      } catch (err) {
-        alert('Server error. Please try again later.');
-      }
-    });
+
     async function loadSuperAdminDashboard() {
       const dash = document.getElementById('superadmin-dashboard');
       dash.innerHTML = '<div class="text-center text-secondary">Loading dashboard...</div>';
@@ -542,14 +559,45 @@
         if (data.success) {
           let html = `
             <div class="container-fluid px-4 py-4 dashboard-container">
+              <!-- Navigation Bar -->
+              <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
+                <div class="container-fluid">
+                  <a class="navbar-brand" href="#">
+                    <img src="assets/img/epiq-logo.png" alt="EPIQ Logo" style="height: 40px;">
+                  </a>
+                  <div class="navbar-nav ms-auto">
+                    <span class="nav-item nav-link">Welcome, ${loggedInUser.first_name} (${loggedInUser.role})</span>
+                    <button class="btn btn-outline-danger" onclick="logout()">Logout</button>
+                  </div>
+                </div>
+              </nav>
               <!-- Dashboard Header -->
               <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2 class="mb-0">Super Admin Dashboard</h2>
-                <button class="btn btn-primary" onclick="showCreateAdminModal()">
-                  <i class="bi bi-plus-circle"></i> Create New Admin
-                </button>
+                <button class="btn btn-primary" onclick="toggleCreateForm('admin')">Create New Admin</button>
               </div>
-
+              <!-- Create Admin Form -->
+              <div id="slideDownCreateForm" class="slide-down-form">
+                <form id="createAdminForm">
+                  <div class="form-group mb-3">
+                    <label for="admin-first-name">First Name</label>
+                    <input type="text" class="form-control" id="admin-first-name" required>
+                  </div>
+                  <div class="form-group mb-3">
+                    <label for="admin-last-name">Last Name</label>
+                    <input type="text" class="form-control" id="admin-last-name">
+                  </div>
+                  <div class="form-group mb-3">
+                    <label for="admin-email">Email</label>
+                    <input type="email" class="form-control" id="admin-email" required>
+                  </div>
+                  <div class="form-group mb-3">
+                    <label for="admin-password">Password</label>
+                    <input type="password" class="form-control" id="admin-password" required>
+                  </div>
+                  <button type="submit" class="btn btn-warning">Create Admin</button>
+                </form>
+              </div>
               <!-- Stats Cards -->
               <div class="row mb-4">
                 <div class="col-md-3">
@@ -587,7 +635,6 @@
                   </div>
                 </div>
               </div>
-
               <!-- Main Content -->
               <div class="row">
                 <div class="col-12">
@@ -733,72 +780,45 @@
                   </div>
                 </div>
               </div>
-            </div>
-
-            <style>
-              .dashboard-container {
-                min-height: 100vh;
-                background: #f8f9fa;
-              }
-
-              .stat-card {
-                border-radius: 10px;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-                transition: transform 0.3s ease;
-              }
-
-              .stat-card:hover {
-                transform: translateY(-5px);
-              }
-
-              .card {
-                border: none;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-                border-radius: 10px;
-              }
-
-              .card-header {
-                border-bottom: 1px solid rgba(0,0,0,0.05);
-              }
-
-              .table {
-                margin: 0;
-              }
-
-              .table th {
-                font-weight: 600;
-                background: #f8f9fa;
-              }
-
-              .btn-primary {
-                background: #4a90e2;
-                border: none;
-                padding: 8px 16px;
-                border-radius: 6px;
-                transition: all 0.3s ease;
-              }
-
-              .btn-primary:hover {
-                background: #357abd;
-                transform: translateY(-1px);
-              }
-
-              .table-hover tbody tr:hover {
-                background-color: rgba(74, 144, 226, 0.05);
-              }
-
-              @media (max-width: 768px) {
-                .stat-card {
-                  margin-bottom: 15px;
-                }
-
-                .dashboard-container {
-                  padding: 15px !important;
-                }
-              }
-            </style>`;
+            </div>`;
 
           dash.innerHTML = html;
+          // Add event listener for the create admin form
+          document.getElementById('createAdminForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            if (!loggedInUser || loggedInUser.role !== 'superadmin') {
+              alert('Only superadmin can create admins.');
+              return;
+            }
+            const first_name = document.getElementById('admin-first-name').value;
+            const last_name = document.getElementById('admin-last-name').value;
+            const email = document.getElementById('admin-email').value;
+            const password = document.getElementById('admin-password').value;
+            try {
+              const response = await fetch('http://localhost:3000/api/create-admin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  creator_role: loggedInUser.role,
+                  first_name,
+                  last_name,
+                  email,
+                  password
+                })
+              });
+              const data = await response.json();
+              if (data.success) {
+                showLoginFeedback('Admin created successfully!', true);
+                document.getElementById('createAdminForm').reset();
+                toggleCreateForm('admin');
+                loadSuperAdminDashboard();
+              } else {
+                showLoginFeedback('Failed to create admin: ' + data.message, false);
+              }
+            } catch (err) {
+              showLoginFeedback('Server error. Please try again later.', false);
+            }
+          });
         } else {
           dash.innerHTML = '<div class="text-danger">Failed to load dashboard.</div>';
         }
@@ -806,6 +826,7 @@
         dash.innerHTML = '<div class="text-danger">Server error loading dashboard.</div>';
       }
     }
+
     async function loadAdminDashboard(adminId) {
       const dash = document.getElementById('admin-dashboard');
       dash.innerHTML = '<div class="text-center text-secondary">Loading users and forms...</div>';
@@ -815,14 +836,45 @@
         if (data.success) {
           let html = `
             <div class="container-fluid px-4 py-4 dashboard-container">
+              <!-- Navigation Bar -->
+              <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
+                <div class="container-fluid">
+                  <a class="navbar-brand" href="#">
+                    <img src="assets/img/epiq-logo.png" alt="EPIQ Logo" style="height: 40px;">
+                  </a>
+                  <div class="navbar-nav ms-auto">
+                    <span class="nav-item nav-link">Welcome, ${loggedInUser.first_name} (${loggedInUser.role})</span>
+                    <button class="btn btn-outline-danger" onclick="logout()">Logout</button>
+                  </div>
+                </div>
+              </nav>
               <!-- Dashboard Header -->
               <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2 class="mb-0">Admin Dashboard</h2>
-                <button class="btn btn-primary" onclick="showCreateUserModal()">
-                  <i class="bi bi-plus-circle"></i> Create New User
-                </button>
+                <button class="btn btn-primary" onclick="toggleCreateForm('user')">Create New User</button>
               </div>
-
+              <!-- Create User Form -->
+              <div id="slideDownCreateForm" class="slide-down-form">
+                <form id="createUserForm">
+                  <div class="form-group mb-3">
+                    <label for="user-first-name">First Name</label>
+                    <input type="text" class="form-control" id="user-first-name" required>
+                  </div>
+                  <div class="form-group mb-3">
+                    <label for="user-last-name">Last Name</label>
+                    <input type="text" class="form-control" id="user-last-name">
+                  </div>
+                  <div class="form-group mb-3">
+                    <label for="user-email">Email</label>
+                    <input type="email" class="form-control" id="user-email" required>
+                  </div>
+                  <div class="form-group mb-3">
+                    <label for="user-password">Password</label>
+                    <input type="password" class="form-control" id="user-password" required>
+                  </div>
+                  <button type="submit" class="btn btn-info">Create User</button>
+                </form>
+              </div>
               <!-- Stats Cards -->
               <div class="row mb-4">
                 <div class="col-md-4">
@@ -947,6 +999,43 @@
             </div>`;
 
           dash.innerHTML = html;
+          // Add event listener for the create user form
+          document.getElementById('createUserForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            if (!loggedInUser || loggedInUser.role !== 'admin') {
+              alert('Only admin can create users.');
+              return;
+            }
+            const first_name = document.getElementById('user-first-name').value;
+            const last_name = document.getElementById('user-last-name').value;
+            const email = document.getElementById('user-email').value;
+            const password = document.getElementById('user-password').value;
+            try {
+              const response = await fetch('http://localhost:3000/api/create-user', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  creator_role: loggedInUser.role,
+                  creator_id: loggedInUser.id,
+                  first_name,
+                  last_name,
+                  email,
+                  password
+                })
+              });
+              const data = await response.json();
+              if (data.success) {
+                showLoginFeedback('User created successfully!', true);
+                document.getElementById('createUserForm').reset();
+                toggleCreateForm('user');
+                loadAdminDashboard(loggedInUser.id);
+              } else {
+                showLoginFeedback('Failed to create user: ' + data.message, false);
+              }
+            } catch (err) {
+              showLoginFeedback('Server error. Please try again later.', false);
+            }
+          });
         } else {
           dash.innerHTML = '<div class="text-danger">Failed to load users and forms.</div>';
         }
@@ -1277,13 +1366,13 @@
         row.style.display = 'none';
       }
     }
-    function showCreateAdminModal() {
-      document.getElementById('create-admin-container').style.display = 'block';
-      document.getElementById('superadmin-dashboard').style.display = 'none';
-    }
-    function showCreateUserModal() {
-      document.getElementById('create-user-container').style.display = 'block';
-      document.getElementById('admin-dashboard').style.display = 'none';
+    function toggleCreateForm(type) {
+      const formDiv = document.getElementById('slideDownCreateForm');
+      if (formDiv.classList.contains('show')) {
+        formDiv.classList.remove('show');
+      } else {
+        formDiv.classList.add('show');
+      }
     }
   </script>
   <!-- Edit Form Modal -->
