@@ -235,25 +235,65 @@ app.get('/api/admin-full-dashboard/:adminId', async (req, res) => {
 // Edit user (admin or user)
 app.put('/api/user/:id', async (req, res) => {
   const { id } = req.params;
-  const { first_name, last_name, email, role, status } = req.body;
+  const { first_name, last_name, email, role, admin_id, user_role } = req.body;
   try {
+    // Check if user exists
+    const userResult = await pool.query('SELECT * FROM users WHERE id = $1', [id]);
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'User not found.' });
+    }
+    const user = userResult.rows[0];
+
+    // Authorization checks
+    if (user_role === 'admin') {
+      // Admin can only edit their own users
+      if (user.created_by !== parseInt(admin_id)) {
+        return res.status(403).json({ success: false, message: 'Admin can only edit their own users.' });
+      }
+    }
+
+    // Update user
     const result = await pool.query(
-      'UPDATE users SET first_name=$1, last_name=$2, email=$3, role=$4, status=$5 WHERE id=$6 RETURNING *',
-      [first_name, last_name, email, role, status, id]
+      'UPDATE users SET first_name=$1, last_name=$2, email=$3, role=$4 WHERE id=$5 RETURNING *',
+      [first_name, last_name, email, role, id]
     );
     res.json({ success: true, user: result.rows[0] });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Error editing user.' });
+    console.error(error);
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
 // Delete user (admin or user)
 app.delete('/api/user/:id', async (req, res) => {
+  console.log('DELETE /api/user/:id called with params:', req.params, 'and body:', req.body);
   const { id } = req.params;
+  const { admin_id, user_role } = req.body;
   try {
-    await pool.query('DELETE FROM users WHERE id=$1', [id]);
+    // Check if user exists
+    const userResult = await pool.query('SELECT * FROM users WHERE id = $1', [id]);
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'User not found.' });
+    }
+    const user = userResult.rows[0];
+
+    // Authorization checks
+    if (user_role === 'admin') {
+      // Admin can only delete their own users
+      if (user.created_by !== parseInt(admin_id)) {
+        return res.status(403).json({ success: false, message: 'Admin can only delete their own users.' });
+      }
+    }
+
+    // Delete user's forms first
+    await pool.query('DELETE FROM form_submissions WHERE user_id = $1', [id]);
+    // Delete user's submissions (the other table causing the error)
+    await pool.query('DELETE FROM submissions WHERE user_id = $1', [id]);
+    // Then delete the user
+    await pool.query('DELETE FROM users WHERE id = $1', [id]);
     res.json({ success: true });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ success: false, message: 'Error deleting user.' });
   }
 });
@@ -261,14 +301,34 @@ app.delete('/api/user/:id', async (req, res) => {
 // Edit form submission
 app.put('/api/form/:id', async (req, res) => {
   const { id } = req.params;
-  const { form_data, status } = req.body;
+  const { form_data, status, admin_id, user_role } = req.body;
   try {
+    // Check if form exists and get user info
+    const formResult = await pool.query(
+      'SELECT f.*, u.created_by FROM form_submissions f JOIN users u ON f.user_id = u.id WHERE f.id = $1',
+      [id]
+    );
+    if (formResult.rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Form not found.' });
+    }
+    const form = formResult.rows[0];
+
+    // Authorization checks
+    if (user_role === 'admin') {
+      // Admin can only edit forms of their users
+      if (form.created_by !== parseInt(admin_id)) {
+        return res.status(403).json({ success: false, message: 'Admin can only edit forms of their users.' });
+      }
+    }
+
+    // Update form
     const result = await pool.query(
       'UPDATE form_submissions SET form_data=$1, status=$2 WHERE id=$3 RETURNING *',
       [form_data, status, id]
     );
     res.json({ success: true, form: result.rows[0] });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ success: false, message: 'Error editing form.' });
   }
 });
@@ -276,10 +336,31 @@ app.put('/api/form/:id', async (req, res) => {
 // Delete form submission
 app.delete('/api/form/:id', async (req, res) => {
   const { id } = req.params;
+  const { admin_id, user_role } = req.body;
   try {
-    await pool.query('DELETE FROM form_submissions WHERE id=$1', [id]);
+    // Check if form exists and get user info
+    const formResult = await pool.query(
+      'SELECT f.*, u.created_by FROM form_submissions f JOIN users u ON f.user_id = u.id WHERE f.id = $1',
+      [id]
+    );
+    if (formResult.rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Form not found.' });
+    }
+    const form = formResult.rows[0];
+
+    // Authorization checks
+    if (user_role === 'admin') {
+      // Admin can only delete forms of their users
+      if (form.created_by !== parseInt(admin_id)) {
+        return res.status(403).json({ success: false, message: 'Admin can only delete forms of their users.' });
+      }
+    }
+
+    // Delete form
+    await pool.query('DELETE FROM form_submissions WHERE id = $1', [id]);
     res.json({ success: true });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ success: false, message: 'Error deleting form.' });
   }
 });
