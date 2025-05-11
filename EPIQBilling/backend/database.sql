@@ -40,3 +40,17 @@ CREATE TABLE IF NOT EXISTS form_submissions (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     status VARCHAR(20) DEFAULT 'final'
 );
+
+ALTER TABLE users ADD COLUMN role VARCHAR(20) NOT NULL DEFAULT 'user';
+ALTER TABLE users ADD COLUMN status VARCHAR(20) NOT NULL DEFAULT 'active';
+
+-- Drop and recreate with cascade
+ALTER TABLE form_submissions DROP CONSTRAINT form_submissions_user_id_fkey;
+ALTER TABLE form_submissions ADD CONSTRAINT form_submissions_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
+
+ALTER TABLE submissions DROP CONSTRAINT submissions_user_id_fkey;
+ALTER TABLE submissions ADD CONSTRAINT submissions_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
+
+SELECT * FROM users WHERE id = 3;
+
+SELECT * FROM users WHERE email = 'admin@gmail.com';
