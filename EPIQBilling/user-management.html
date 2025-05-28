@@ -316,6 +316,154 @@
       color: white;
       border: none;
     }
+    /* Make user dashboard and form area full width */
+    #user-dashboard-container {
+      max-width: 100vw !important;
+      width: 100vw !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      border-radius: 0 !important;
+      background: transparent !important;
+      box-shadow: none !important;
+    }
+    #user-form-area {
+      width: 100vw;
+      max-width: 100vw;
+      margin: 0 auto;
+      padding: 0;
+    }
+    /* Remove .login-container styles for dashboard */
+    #user-dashboard-container .modern-form {
+      max-width: 1200px;
+      margin: 2rem auto;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      background: #fff;
+      padding: 2rem;
+    }
+    /* Modern dashboard styles */
+    #user-dashboard-container {
+      max-width: 900px !important;
+      width: 100%;
+      margin: 40px auto 0 auto !important;
+      padding: 40px 32px 32px 32px !important;
+      border-radius: 18px !important;
+      background: rgba(255,255,255,0.98) !important;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.10) !important;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .dashboard-title {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #2c3e50;
+      margin-bottom: 2rem;
+      letter-spacing: 1px;
+      text-align: center;
+    }
+    .dashboard-forms-list {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+    .dashboard-form-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: #f8f9fa;
+      border-radius: 10px;
+      padding: 1.2rem 1.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      transition: box-shadow 0.2s;
+    }
+    .dashboard-form-row:hover {
+      box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+    }
+    .dashboard-form-btn {
+      flex: 1;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 6px;
+      padding: 0.7rem 1.2rem;
+      border: none;
+      background: #007bff;
+      color: #fff;
+      transition: background 0.2s;
+      cursor: pointer;
+    }
+    .dashboard-form-btn:hover {
+      background: #0056b3;
+    }
+    .dashboard-add-note-btn {
+      background: #28a745;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 0.7rem 1.2rem;
+      font-size: 1.05rem;
+      font-weight: 500;
+      margin-left: 0.5rem;
+      transition: background 0.2s;
+      cursor: pointer;
+    }
+    .dashboard-add-note-btn:hover {
+      background: #218838;
+    }
+    /* Note Modal Styles */
+    .note-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+    }
+    .note-modal-content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 600px;
+    }
+    .note-modal textarea {
+      width: 100%;
+      min-height: 120px;
+      margin: 1rem 0;
+      padding: 1rem;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+      resize: vertical;
+    }
+    .note-modal-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+    }
+    .note-modal-buttons button {
+      padding: 0.8rem 1.5rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .note-modal-buttons .save {
+      background: #28a745;
+      color: white;
+      border: none;
+    }
+    .note-modal-buttons .cancel {
+      background: #6c757d;
+      color: white;
+      border: none;
+    }
   </style>
 </head>
 <body>
@@ -370,17 +518,43 @@
     <button onclick="window.location.reload()" class="btn btn-outline-secondary w-100 mt-3">← Back</button>
   </div>
   <!-- User Dashboard Container -->
-  <div class="login-container shadow-lg rounded bg-white" id="user-dashboard-container" style="display:none;">
-    <h2 class="login-title">User Dashboard</h2>
-    <div class="mb-4">
-      <button class="btn btn-outline-primary me-2 mb-2" onclick="showForm('outpatient_therapy')">Outpatient Therapy Form</button>
-      <button class="btn btn-outline-primary me-2 mb-2" onclick="showForm('medicare_eligibility')">Medicare Eligibility Check</button>
-      <button class="btn btn-outline-primary me-2 mb-2" onclick="showForm('home_health_billing_audit')">Home Health Billing Audit (NOA)</button>
-      <button class="btn btn-outline-primary me-2 mb-2" onclick="showForm('coding_needed_list')">Coding Needed List</button>
-      <button class="btn btn-outline-primary me-2 mb-2" onclick="showForm('final_billing_audit')">Final Billing Audit (PDGM)</button>
+  <div class="login-container" id="user-dashboard-container" style="display:none;">
+    <div class="dashboard-title">User Dashboard</div>
+    <div class="dashboard-forms-list">
+      <div class="dashboard-form-row">
+        <button class="dashboard-form-btn" onclick="showForm('outpatient_therapy')">Outpatient Therapy Form</button>
+        <button class="dashboard-add-note-btn" onclick="showNoteModal('outpatient_therapy')">Add Note</button>
+      </div>
+      <div class="dashboard-form-row">
+        <button class="dashboard-form-btn" onclick="showForm('medicare_eligibility')">Medicare Eligibility Check</button>
+        <button class="dashboard-add-note-btn" onclick="showNoteModal('medicare_eligibility')">Add Note</button>
+      </div>
+      <div class="dashboard-form-row">
+        <button class="dashboard-form-btn" onclick="showForm('home_health_billing_audit')">Home Health Billing Audit (NOA)</button>
+        <button class="dashboard-add-note-btn" onclick="showNoteModal('home_health_billing_audit')">Add Note</button>
+      </div>
+      <div class="dashboard-form-row">
+        <button class="dashboard-form-btn" onclick="showForm('coding_needed_list')">Coding Needed List</button>
+        <button class="dashboard-add-note-btn" onclick="showNoteModal('coding_needed_list')">Add Note</button>
+      </div>
+      <div class="dashboard-form-row">
+        <button class="dashboard-form-btn" onclick="showForm('final_billing_audit')">Final Billing Audit (PDGM)</button>
+        <button class="dashboard-add-note-btn" onclick="showNoteModal('final_billing_audit')">Add Note</button>
+      </div>
     </div>
     <div id="user-form-area"></div>
     <button onclick="window.location.reload()" class="btn btn-outline-secondary w-100 mt-3">← Back</button>
+    <!-- Note Modal -->
+    <div id="noteModal" class="note-modal">
+      <div class="note-modal-content">
+        <h3>Add Note for <span id="noteFormName"></span></h3>
+        <textarea id="modalNoteText" placeholder="Enter your note here..."></textarea>
+        <div class="note-modal-buttons">
+          <button class="cancel" onclick="closeNoteModal()">Cancel</button>
+          <button class="save" onclick="saveNote()">Save Note</button>
+        </div>
+      </div>
+    </div>
   </div>
   <!-- Dashboard Containers -->
   <div id="superadmin-dashboard" style="display:none;"></div>
@@ -1895,22 +2069,31 @@
         formDiv.classList.add('show');
       }
     }
-    // Modal logic for notes
-    let currentFieldId = null;
-    function showNoteModal(fieldId) {
-      currentFieldId = fieldId;
+    // Modal logic for notes (dashboard-wide)
+    let currentFormType = null;
+    function showNoteModal(formType) {
+      currentFormType = formType;
       document.getElementById('noteModal').style.display = 'block';
       document.getElementById('modalNoteText').value = '';
+      // Set form name in modal
+      const formNames = {
+        outpatient_therapy: 'Outpatient Therapy Form',
+        medicare_eligibility: 'Medicare Eligibility Check',
+        home_health_billing_audit: 'Home Health Billing Audit (NOA)',
+        coding_needed_list: 'Coding Needed List',
+        final_billing_audit: 'Final Billing Audit (PDGM)'
+      };
+      document.getElementById('noteFormName').innerText = formNames[formType] || '';
     }
     function closeNoteModal() {
       document.getElementById('noteModal').style.display = 'none';
-      currentFieldId = null;
+      currentFormType = null;
     }
     function saveNote() {
       const noteText = document.getElementById('modalNoteText').value;
       if (noteText.trim()) {
         // You can implement saving the note to localStorage or backend as needed
-        alert('Note for ' + currentFieldId + ': ' + noteText);
+        alert('Note for ' + currentFormType + ': ' + noteText);
         closeNoteModal();
       }
     }
