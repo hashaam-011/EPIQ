@@ -16,7 +16,8 @@ CREATE TABLE users (
     phone VARCHAR(20),
     accept_offers BOOLEAN DEFAULT false,
     accept_terms BOOLEAN DEFAULT false,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_login TIMESTAMP
 );
 
 -- Clean up any invalid records

@@ -148,7 +148,9 @@ app.post('/api/login', async (req, res) => {
       [email, password, role]
     );
     if (result.rows.length > 0) {
-      res.json({ success: true, user: result.rows[0] });
+      // Update last_login
+      await pool.query('UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = $1', [result.rows[0].id]);
+      res.json({ success: true, user: { ...result.rows[0], last_login: new Date() } });
     } else {
       res.json({ success: false, message: 'Invalid credentials or role.' });
     }
@@ -435,6 +437,47 @@ app.get('/api/user/:id', async (req, res) => {
     res.status(500).json({ success: false, message: 'Error fetching user.' });
   }
 });
+
+// Endpoint to update user/admin login details (superadmin only)
+app.put('/api/superadmin/user/:id', async (req, res) => {
+  const { id } = req.params;
+  const { first_name, last_name, email, password, role } = req.body;
+  try {
+    const result = await pool.query(
+      'UPDATE users SET first_name=$1, last_name=$2, email=$3, password=$4, role=$5 WHERE id=$6 RETURNING *',
+      [first_name, last_name, email, password, role, id]
+    );
+    res.json({ success: true, user: result.rows[0] });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error updating user.' });
+  }
+});
+
+// Endpoint to delete user/admin (superadmin only)
+app.delete('/api/superadmin/user/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    await pool.query('DELETE FROM users WHERE id = $1', [id]);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error deleting user.' });
+  }
+});
+
+// Endpoint to move a user to another admin (superadmin only)
+app.put('/api/superadmin/move-user/:userId', async (req, res) => {
+  const { userId } = req.params;
+  const { newAdminId } = req.body;
+  try {
+    const result = await pool.query('UPDATE users SET created_by = $1 WHERE id = $2 RETURNING *', [newAdminId, userId]);
+    res.json({ success: true, user: result.rows[0] });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error moving user.' });
+  }
+});
+
+// Add last_login column to users if not exists (run once)
+pool.query("ALTER TABLE users ADD COLUMN IF NOT EXISTS last_login TIMESTAMP;");
 
 // Start server
 const PORT = process.env.PORT || 3000;
