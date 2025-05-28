@@ -56,6 +56,71 @@ app.post('/api/submit-form', async (req, res) => {
   }
 });
 
+// API endpoint to add a note to a form submission
+app.post('/api/form/:id/note', async (req, res) => {
+  const { id } = req.params;
+  const { note, user_id, user_role } = req.body;
+
+  try {
+    // Check if form exists and get user info
+    const formResult = await pool.query(
+      'SELECT f.*, u.created_by FROM form_submissions f JOIN users u ON f.user_id = u.id WHERE f.id = $1',
+      [id]
+    );
+
+    if (formResult.rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Form not found.' });
+    }
+
+    const form = formResult.rows[0];
+
+    // Authorization checks
+    if (user_role === 'admin') {
+      // Admin can only add notes to forms of their users
+      if (form.created_by !== parseInt(user_id)) {
+        return res.status(403).json({ success: false, message: 'Admin can only add notes to forms of their users.' });
+      }
+    } else if (user_role === 'user') {
+      // Users can only add notes to their own forms
+      if (form.user_id !== parseInt(user_id)) {
+        return res.status(403).json({ success: false, message: 'You can only add notes to your own forms.' });
+      }
+    }
+
+    // Add the note
+    const result = await pool.query(
+      'UPDATE form_submissions SET notes = CASE WHEN notes IS NULL THEN $1 ELSE notes || E\'\\n\' || $1 END WHERE id = $2 RETURNING *',
+      [note, id]
+    );
+
+    res.json({ success: true, form: result.rows[0] });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: 'Error adding note.' });
+  }
+});
+
+// API endpoint to get a form with its notes
+app.get('/api/form/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(
+      `SELECT f.*, u.first_name, u.last_name, u.email, u.role
+       FROM form_submissions f
+       JOIN users u ON f.user_id = u.id
+       WHERE f.id = $1`,
+      [id]
+    );
+    if (result.rows.length > 0) {
+      res.json({ success: true, form: result.rows[0] });
+    } else {
+      res.json({ success: false, message: 'Form not found.' });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error fetching form.' });
+  }
+});
+
 // API endpoint to get a draft for a user and form type
 app.get('/api/get-draft/:user_id/:form_type', async (req, res) => {
   const { user_id, form_type } = req.params;
@@ -132,14 +197,6 @@ app.post('/api/create-user', async (req, res) => {
     return res.status(403).json({ success: false, message: 'Only admin can create users.' });
   }
   try {
-    // Count users created by this admin
-    const countResult = await pool.query(
-      'SELECT COUNT(*) FROM users WHERE created_by = $1 AND role = $2',
-      [creator_id, 'user']
-    );
-    if (parseInt(countResult.rows[0].count) >= 4) {
-      return res.status(403).json({ success: false, message: 'Admin can only create 4 users.' });
-    }
     const result = await pool.query(
       'INSERT INTO users (first_name, last_name, email, password, role, created_by) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
       [first_name, last_name, email, password, 'user', creator_id]
@@ -289,7 +346,6 @@ app.delete('/api/user/:id', async (req, res) => {
     await pool.query('DELETE FROM form_submissions WHERE user_id = $1', [id]);
     // Delete user's submissions (the other table causing the error)
     await pool.query('DELETE FROM submissions WHERE user_id = $1', [id]);
-    // Then delete the user
     await pool.query('DELETE FROM users WHERE id = $1', [id]);
     res.json({ success: true });
   } catch (error) {
@@ -377,21 +433,6 @@ app.get('/api/user/:id', async (req, res) => {
     }
   } catch (error) {
     res.status(500).json({ success: false, message: 'Error fetching user.' });
-  }
-});
-
-// Get individual form
-app.get('/api/form/:id', async (req, res) => {
-  const { id } = req.params;
-  try {
-    const result = await pool.query('SELECT * FROM form_submissions WHERE id = $1', [id]);
-    if (result.rows.length > 0) {
-      res.json({ success: true, form: result.rows[0] });
-    } else {
-      res.json({ success: false, message: 'Form not found.' });
-    }
-  } catch (error) {
-    res.status(500).json({ success: false, message: 'Error fetching form.' });
   }
 });
 

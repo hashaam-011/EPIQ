@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Form - EPIQ Billing</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        body {
+            background: #f8f9fa;
+            padding: 2rem;
+        }
+
+        .form-view {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .form-view h2 {
+            font-size: 2rem;
+            color: #2c3e50;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .form-details {
+            margin: 2rem 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 2rem;
+        }
+
+        .form-field {
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+            position: relative;
+        }
+
+        .form-field label {
+            font-weight: 600;
+            color: #2c3e50;
+            display: block;
+            margin-bottom: 0.8rem;
+            font-size: 1.1rem;
+        }
+
+        .form-value {
+            color: #495057;
+            font-size: 1.1rem;
+            line-height: 1.5;
+            padding: 0.5rem;
+            background: white;
+            border-radius: 4px;
+            border: 1px solid #dee2e6;
+        }
+
+        .field-actions {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+        }
+
+        .add-note-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+
+        .add-note-btn:hover {
+            background: #0056b3;
+        }
+
+        .notes-section {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 2px solid #e9ecef;
+        }
+
+        .notes-section h3 {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+        }
+
+        .notes-list {
+            margin: 1.5rem 0;
+            display: grid;
+            gap: 1rem;
+        }
+
+        .note {
+            padding: 1.2rem;
+            background: #e9ecef;
+            border-radius: 8px;
+            color: #495057;
+            font-size: 1.1rem;
+            line-height: 1.5;
+            border-left: 4px solid #007bff;
+        }
+
+        .add-note {
+            margin-top: 2rem;
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+
+        .add-note textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            resize: vertical;
+            font-size: 1.1rem;
+        }
+
+        .add-note button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: background 0.2s;
+        }
+
+        .add-note button:hover {
+            background: #218838;
+        }
+
+        .note-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .note-modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+        }
+
+        .note-modal textarea {
+            width: 100%;
+            min-height: 150px;
+            margin: 1rem 0;
+            padding: 1rem;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            resize: vertical;
+        }
+
+        .note-modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        .note-modal-buttons button {
+            padding: 0.8rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .note-modal-buttons .save {
+            background: #28a745;
+            color: white;
+            border: none;
+        }
+
+        .note-modal-buttons .cancel {
+            background: #6c757d;
+            color: white;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="formContainer">
+        <!-- Form content will be loaded here -->
+    </div>
+
+    <!-- Note Modal -->
+    <div id="noteModal" class="note-modal">
+        <div class="note-modal-content">
+            <h3>Add Note</h3>
+            <textarea id="modalNoteText" placeholder="Enter your note here..."></textarea>
+            <div class="note-modal-buttons">
+                <button class="cancel" onclick="closeNoteModal()">Cancel</button>
+                <button class="save" onclick="saveNote()">Save Note</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/js/main.js"></script>
+    <script>
+        let currentFieldId = null;
+
+        function showNoteModal(fieldId) {
+            currentFieldId = fieldId;
+            document.getElementById('noteModal').style.display = 'block';
+            document.getElementById('modalNoteText').value = '';
+        }
+
+        function closeNoteModal() {
+            document.getElementById('noteModal').style.display = 'none';
+            currentFieldId = null;
+        }
+
+        function saveNote() {
+            const noteText = document.getElementById('modalNoteText').value;
+            if (noteText.trim()) {
+                addNote(currentFieldId, noteText);
+                closeNoteModal();
+            }
+        }
+
+        // Get form ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const formId = urlParams.get('id');
+
+        if (formId) {
+            loadFormDetails(formId);
+        } else {
+            document.getElementById('formContainer').innerHTML = '<p>No form ID provided</p>';
+        }
+    </script>
+</body>
+</html>
