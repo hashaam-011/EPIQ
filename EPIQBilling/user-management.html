@@ -353,7 +353,6 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      transition: all 0.3s;
     }
     .dashboard-title {
       font-size: 2.2rem;
@@ -390,17 +389,16 @@
       border-radius: 6px;
       padding: 0.7rem 1.2rem;
       border: none;
-      background: linear-gradient(90deg, #007bff 60%, #00c6ff 100%);
+      background: #007bff;
       color: #fff;
       transition: background 0.2s;
       cursor: pointer;
-      box-shadow: 0 2px 8px rgba(0,123,255,0.08);
     }
     .dashboard-form-btn:hover {
-      background: linear-gradient(90deg, #0056b3 60%, #00aaff 100%);
+      background: #0056b3;
     }
     .dashboard-add-note-btn {
-      background: linear-gradient(90deg, #28a745 60%, #6ee7b7 100%);
+      background: #28a745;
       color: #fff;
       border: none;
       border-radius: 6px;
@@ -410,96 +408,61 @@
       margin-left: 0.5rem;
       transition: background 0.2s;
       cursor: pointer;
-      box-shadow: 0 2px 8px rgba(40,167,69,0.08);
     }
     .dashboard-add-note-btn:hover {
-      background: linear-gradient(90deg, #218838 60%, #34d399 100%);
+      background: #218838;
     }
-    /* Form Styles */
-    .modern-form {
-      max-width: 700px;
-      margin: 3rem auto 0 auto;
-      padding: 2.5rem 2rem 2rem 2rem;
-      background: #fff;
-      border-radius: 18px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+    /* Note Modal Styles */
+    .note-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+    }
+    .note-modal-content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 600px;
+    }
+    .note-modal textarea {
+      width: 100%;
+      min-height: 120px;
+      margin: 1rem 0;
+      padding: 1rem;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+      resize: vertical;
+    }
+    .note-modal-buttons {
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      animation: fadeIn 0.5s;
+      justify-content: flex-end;
+      gap: 1rem;
     }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(40px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .modern-form h5 {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: #007bff;
-      margin-bottom: 2rem;
-      letter-spacing: 0.5px;
-      text-align: center;
-    }
-    .modern-form-grid {
-      width: 100%;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.5rem 2rem;
-      margin-bottom: 2rem;
-    }
-    .modern-form-field label {
-      font-weight: 600;
-      color: #2c3e50;
-      margin-bottom: 0.5rem;
-      font-size: 1.1rem;
-    }
-    .modern-form-field input,
-    .modern-form-field select {
-      width: 100%;
-      padding: 0.7rem 1rem;
-      border-radius: 6px;
-      border: 1.5px solid #e0e0e0;
-      font-size: 1.05rem;
-      background: #f8f9fa;
-      transition: border 0.2s;
-    }
-    .modern-form-field input:focus,
-    .modern-form-field select:focus {
-      border: 1.5px solid #007bff;
-      outline: none;
-      background: #fff;
-    }
-    .modern-form button[type="submit"] {
-      width: 100%;
-      background: linear-gradient(90deg, #28a745 60%, #6ee7b7 100%);
-      color: #fff;
-      font-size: 1.2rem;
-      font-weight: 600;
-      border: none;
-      border-radius: 8px;
-      padding: 0.9rem 0;
-      margin-top: 1.5rem;
-      box-shadow: 0 2px 8px rgba(40,167,69,0.08);
-      transition: background 0.2s;
-    }
-    .modern-form button[type="submit"]:hover {
-      background: linear-gradient(90deg, #218838 60%, #34d399 100%);
-    }
-    .back-to-dashboard-btn {
-      margin-top: 1.5rem;
-      background: #f1f3f5;
-      color: #007bff;
-      border: none;
-      border-radius: 8px;
-      padding: 0.7rem 2rem;
-      font-size: 1.1rem;
-      font-weight: 500;
+    .note-modal-buttons button {
+      padding: 0.8rem 1.5rem;
+      border-radius: 4px;
       cursor: pointer;
-      transition: background 0.2s, color 0.2s;
+      font-size: 1rem;
     }
-    .back-to-dashboard-btn:hover {
-      background: #007bff;
-      color: #fff;
+    .note-modal-buttons .save {
+      background: #28a745;
+      color: white;
+      border: none;
+    }
+    .note-modal-buttons .cancel {
+      background: #6c757d;
+      color: white;
+      border: none;
     }
   </style>
 </head>
@@ -1332,52 +1295,82 @@
       }
     }
     function showForm(formType) {
-      // Hide dashboard, show only form
-      document.querySelector('#user-dashboard-container .dashboard-forms-list').style.display = 'none';
-      document.querySelector('#user-dashboard-container .dashboard-title').style.display = 'none';
-      // Render form
       const area = document.getElementById('user-form-area');
       if (formType === 'outpatient_therapy') {
         area.innerHTML = `
           <form id="outpatientTherapyForm" class="modern-form">
-            <h5>Outpatient Therapy Medicare Ready To Bill</h5>
+            <h5 class="mb-3">Outpatient Therapy Medicare Ready To Bill</h5>
             <div class="modern-form-grid">
               <div class="modern-form-field">
                 <label>Patient First Name</label>
-                <input type="text" class="form-control" name="patient_first_name" required>
+                <div class="field-row">
+                  <input type="text" class="form-control" name="patient_first_name" required>
+                  <button type="button" class="add-note-btn" onclick="showNoteModal('patient_first_name')">Add Note</button>
+                </div>
               </div>
               <div class="modern-form-field">
                 <label>Patient Last Name</label>
-                <input type="text" class="form-control" name="patient_last_name" required>
+                <div class="field-row">
+                  <input type="text" class="form-control" name="patient_last_name" required>
+                  <button type="button" class="add-note-btn" onclick="showNoteModal('patient_last_name')">Add Note</button>
+                </div>
               </div>
               <div class="modern-form-field">
                 <label>Date From</label>
-                <input type="date" class="form-control" name="date_from" required>
+                <div class="field-row">
+                  <input type="date" class="form-control" name="date_from" required>
+                  <button type="button" class="add-note-btn" onclick="showNoteModal('date_from')">Add Note</button>
+                </div>
               </div>
               <div class="modern-form-field">
                 <label>Date To</label>
-                <input type="date" class="form-control" name="date_to" required>
+                <div class="field-row">
+                  <input type="date" class="form-control" name="date_to" required>
+                  <button type="button" class="add-note-btn" onclick="showNoteModal('date_to')">Add Note</button>
+                </div>
               </div>
               <div class="modern-form-field">
                 <label>Therapist First Name</label>
-                <input type="text" class="form-control" name="therapist_first_name" required>
+                <div class="field-row">
+                  <input type="text" class="form-control" name="therapist_first_name" required>
+                  <button type="button" class="add-note-btn" onclick="showNoteModal('therapist_first_name')">Add Note</button>
+                </div>
               </div>
               <div class="modern-form-field">
                 <label>Therapist Last Name</label>
-                <input type="text" class="form-control" name="therapist_last_name" required>
+                <div class="field-row">
+                  <input type="text" class="form-control" name="therapist_last_name" required>
+                  <button type="button" class="add-note-btn" onclick="showNoteModal('therapist_last_name')">Add Note</button>
+                </div>
               </div>
               <div class="modern-form-field">
                 <label>NPI</label>
-                <input type="text" class="form-control" name="npi" required>
+                <div class="field-row">
+                  <input type="text" class="form-control" name="npi" required>
+                  <button type="button" class="add-note-btn" onclick="showNoteModal('npi')">Add Note</button>
+                </div>
               </div>
               <div class="modern-form-field">
                 <label>Specialty</label>
-                <input type="text" class="form-control" name="specialty" required>
+                <div class="field-row">
+                  <input type="text" class="form-control" name="specialty" required>
+                  <button type="button" class="add-note-btn" onclick="showNoteModal('specialty')">Add Note</button>
+                </div>
               </div>
             </div>
-            <button type="submit">Submit</button>
-            <button type="button" class="back-to-dashboard-btn" onclick="backToDashboard()">Back to Dashboard</button>
+            <button type="submit" class="btn btn-success w-100 mt-4">Submit</button>
           </form>
+          <!-- Note Modal -->
+          <div id="noteModal" class="note-modal" style="display:none;">
+            <div class="note-modal-content">
+              <h3>Add Note</h3>
+              <textarea id="modalNoteText" placeholder="Enter your note here..."></textarea>
+              <div class="note-modal-buttons">
+                <button class="cancel" onclick="closeNoteModal()">Cancel</button>
+                <button class="save" onclick="saveNote()">Save Note</button>
+              </div>
+            </div>
+          </div>
         `;
         document.getElementById('outpatientTherapyForm').onsubmit = async function(e) {
           e.preventDefault();
@@ -1386,14 +1379,537 @@
           formData.forEach((v, k) => data[k] = v);
           await submitUserForm('outpatient_therapy', data);
         };
+      } else if (formType === 'medicare_eligibility') {
+        area.innerHTML = `
+          <form id="medicareEligibilityForm" class="mb-4">
+            <h5 class="mb-3">Medicare Eligibility Check Request Form</h5>
+            <div class="mb-2"><input type="text" class="form-control mb-2" name="agency_name" placeholder="Agency Name*" required></div>
+            <div class="mb-2"><input type="email" class="form-control mb-2" name="email" placeholder="Email to send report to*" required></div>
+            <div class="mb-2"><input type="text" class="form-control mb-2" name="patient_last_name" placeholder="Patient Last Name*" required></div>
+            <div class="mb-2"><input type="text" class="form-control mb-2" name="patient_first_name" placeholder="Patient First Name*" required></div>
+            <div class="mb-2"><input type="date" class="form-control mb-2" name="dob" placeholder="Date of Birth*" required></div>
+            <div class="mb-2"><input type="text" class="form-control mb-2" name="medicare_number" placeholder="Patient Medicare #*" required></div>
+            <div class="mb-2"><textarea class="form-control" name="comments" placeholder="Comments"></textarea></div>
+            <button type="submit" class="btn btn-success">Submit Medicare Eligibility Form</button>
+          </form>
+        `;
+        document.getElementById('medicareEligibilityForm').onsubmit = async function(e) {
+          e.preventDefault();
+          const formData = new FormData(this);
+          const data = {};
+          formData.forEach((v, k) => data[k] = v);
+          await submitUserForm('medicare_eligibility', data);
+        };
+      } else if (formType === 'home_health_billing_audit') {
+        area.innerHTML = `
+          <form id="homeHealthBillingAuditForm" class="mb-4">
+            <div class="card p-4" style="border:2px solid #2986d6; border-radius:10px;">
+              <h4 class="text-center fw-bold mb-1" style="text-transform:uppercase;">HOME HEALTH BILLING AUDIT FORM</h4>
+              <div class="text-center mb-2" style="font-size:1.2rem; font-weight:500;">Notice of Admission (NOA)</div>
+              <div class="text-center mb-2 text-danger" style="font-size:0.95rem;">*NOA MUST BE BILLED WITHIN 5 CALENDAR DAYS AFTER THE EFFECTIVE DATE OF ADMISSION*</div>
+              <div class="row g-3 mb-2">
+                <div class="col-md-6">
+                  <label class="form-label fw-bold">Agency Name:<span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" name="agency_name" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-bold">Insurance Company:<span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" name="insurance_company" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-bold">Patient's Name:<span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" name="patient_name" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-bold">Reviewer's Name:<span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" name="reviewer_name" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-bold">Review Date:<span class="text-danger">*</span></label>
+                  <input type="date" class="form-control" name="review_date" required>
+                </div>
+                <div class="col-md-12">
+                  <label class="form-label fw-bold">Comments:</label>
+                  <textarea class="form-control" name="comments" rows="2"></textarea>
+                </div>
+              </div>
+              <div class="p-3 mb-2" style="border:1.5px solid #2986d6; border-radius:7px;">
+                <div class="fw-bold text-uppercase mb-2" style="font-size:1.05rem;">Admission Information:</div>
+                <div class="row align-items-center mb-2">
+                  <div class="col-md-7">
+                    <label class="form-label">Is this a transfer from another home health?<span class="text-danger">*</span></label>
+                  </div>
+                  <div class="col-md-5">
+                    <div class="d-flex align-items-center gap-3">
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="transfer" value="yes" required>
+                        <label class="form-check-label">YES</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="transfer" value="no" required>
+                        <label class="form-check-label">NO</label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row mb-2">
+                  <div class="col-md-6">
+                    <label class="form-label">Date of Admission:<span class="text-danger">*</span></label>
+                    <input type="date" class="form-control" name="date_of_admission" required>
+                  </div>
+                </div>
+                <div class="mb-2">
+                  <div class="fw-bold">NOTE: PLEASE MAKE SURE THAT YOU HAVE THE FOLLOWING INFORMATION IN YOUR SOFTWARE:</div>
+                  <ul class="mb-0">
+                    <li>POINT OF ORIGIN OF ADMISSION</li>
+                    <li>PATIENT STATUS</li>
+                    <li>HIPPS CODE (Default 1AA11)</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="p-3 mb-2" style="border:1.5px solid #2986d6; border-radius:7px;">
+                <div class="fw-bold text-uppercase mb-2" style="font-size:1.05rem;">Physician Information:</div>
+                <div class="row align-items-center">
+                  <div class="col-md-8">
+                    <label class="form-label">Make sure the attending physician in PECOS<span class="text-danger">*</span></label>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="d-flex align-items-center gap-3">
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="physician_pecos" value="yes" required>
+                        <label class="form-check-label">YES</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="physician_pecos" value="no" required>
+                        <label class="form-check-label">NO</label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="p-3 mb-2" style="border:1.5px solid #2986d6; border-radius:7px;">
+                <div class="fw-bold text-uppercase mb-2" style="font-size:1.05rem;">Disclaimer:</div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="disclaimer" id="disclaimerCheckbox">
+                  <label class="form-check-label" for="disclaimerCheckbox" style="font-size:0.97rem;">
+                    The above documentation verifies that this health insurance claim is ready for billing. Agency verifies that patient record was reviewed, and that the patient meets the health insurance carrier coverage criteria, schedule has been created, confirmed and authorization number has been entered in software. I authorize all visits listed above to be billed to the patient's health insurance carrier.
+                  </label>
+                </div>
+              </div>
+              <div class="text-center mt-3">
+                <button type="submit" class="btn btn-success px-4">Submit Home Health Billing Audit</button>
+              </div>
+            </div>
+          </form>
+        `;
+        document.getElementById('homeHealthBillingAuditForm').onsubmit = async function(e) {
+          e.preventDefault();
+          const formData = new FormData(this);
+          const data = {};
+          formData.forEach((v, k) => data[k] = v);
+          await submitUserForm('home_health_billing_audit', data);
+        };
+      } else if (formType === 'coding_needed_list') {
+        area.innerHTML = `
+          <form id="codingNeededListForm" class="mb-4">
+            <h5 class="mb-3">Coding Needed List</h5>
+            <div class="table-responsive mb-3">
+              <table class="table table-bordered">
+                <thead class="table-light">
+                  <tr>
+                    <th>#</th>
+                    <th>Patient's First Name</th>
+                    <th>Patient's Last Name</th>
+                    <th>MRN</th>
+                    <th>Payer</th>
+                    <th>Episode From</th>
+                    <th>Episode To</th>
+                    <th>OASIS Type</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${[1,2,3,4,5,6].map(i => `
+                    <tr>
+                      <td>${i}</td>
+                      <td><input type='text' class='form-control' name='first_name_${i}'></td>
+                      <td><input type='text' class='form-control' name='last_name_${i}'></td>
+                      <td><input type='text' class='form-control' name='mrn_${i}'></td>
+                      <td><input type='text' class='form-control' name='payer_${i}'></td>
+                      <td><input type='date' class='form-control' name='episode_from_${i}'></td>
+                      <td><input type='date' class='form-control' name='episode_to_${i}'></td>
+                      <td>
+                        <select class='form-control' name='oasis_type_${i}'>
+                          <option value=''>SELECT ONE</option>
+                          <option value='CODING ONLY'>CODING ONLY</option>
+                          <option value='SOC'>SOC</option>
+                          <option value='RECERT'>RECERT</option>
+                          <option value='D/C'>D/C</option>
+                          <option value='ROC'>ROC</option>
+                          <option value='TRANSFER'>TRANSFER</option>
+                          <option value='SCIC'>SCIC</option>
+                          <option value='HIS'>HIS</option>
+                        </select>
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+            <button type="submit" class="btn btn-success">Submit Coding Needed List</button>
+          </form>
+        `;
+        document.getElementById('codingNeededListForm').onsubmit = async function(e) {
+          e.preventDefault();
+          const formData = new FormData(this);
+          const data = {};
+          formData.forEach((v, k) => data[k] = v);
+          await submitUserForm('coding_needed_list', data);
+        };
+      } else if (formType === 'final_billing_audit') {
+        area.innerHTML = `
+          <form id="finalBillingAuditForm" class="mb-4">
+            <div class="card p-4" style="border:2px solid #2986d6; border-radius:10px;">
+              <h4 class="text-center fw-bold mb-1" style="text-transform:uppercase;">FINAL BILLING AUDIT FORM - PDGM</h4>
+              <div class="text-center mb-2" style="font-size:1.1rem;">All sections with red asterisk are required fields and must be filled out<span class="text-danger">*</span></div>
+              <div class="row g-3 mb-2">
+                <div class="col-md-6">
+                  <label class="form-label fw-bold">Agency Name:<span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" name="agency_name" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-bold">Payer Name:<span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" name="payer_name" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-bold">Reviewer's Name:<span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" name="reviewer_name" required>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label fw-bold">Review Date:<span class="text-danger">*</span></label>
+                  <input type="date" class="form-control" name="review_date" required>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label fw-bold">Patient's Medical Record No:</label>
+                  <input type="text" class="form-control" name="patient_medical_record_no">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-bold">Patient's Name:<span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" name="patient_name" required>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label fw-bold">30-Day Billing Period:</label>
+                  <div class="input-group">
+                    <input type="date" class="form-control" name="billing_period_start">
+                    <span class="input-group-text">to</span>
+                    <input type="date" class="form-control" name="billing_period_end">
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label fw-bold">Cert Period:</label>
+                  <div class="input-group">
+                    <input type="date" class="form-control" name="cert_period_start">
+                    <span class="input-group-text">to</span>
+                    <input type="date" class="form-control" name="cert_period_end">
+                  </div>
+                </div>
+                <div class="col-md-12">
+                  <label class="form-label fw-bold">Comments:</label>
+                  <textarea class="form-control" name="comments" rows="2"></textarea>
+                </div>
+              </div>
+              <!-- PRE-CLAIM REVIEW -->
+              <div class="table-responsive mb-2">
+                <table class="table table-bordered align-middle">
+                  <thead class="table-light">
+                    <tr><th colspan="2">PRE-CLAIM REVIEW</th><th style="width:60px;">YES</th><th style="width:60px;">NO</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td colspan="2">Is Review Choice Demonstration Applicable in Your State?<span class="text-danger">*</span></td>
+                      <td><input type="radio" name="review_choice_applicable" value="yes" required></td>
+                      <td><input type="radio" name="review_choice_applicable" value="no" required></td>
+                    </tr>
+                    <tr>
+                      <td colspan="2">Which Review Choice Did Your Agency Make?</td>
+                      <td colspan="2">
+                        <select class="form-select" name="review_choice">
+                          <option value="">Select</option>
+                          <option value="pre-claim">Pre-Claim</option>
+                          <option value="post-claim">Post-Claim</option>
+                          <option value="minimal">Minimal</option>
+                        </select>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td colspan="2">Was the UTN (unique tracking number) entered in the software?<span class="text-danger">*</span></td>
+                      <td><input type="radio" name="utn_entered" value="yes" required></td>
+                      <td><input type="radio" name="utn_entered" value="no" required></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <!-- ADMISSION SOURCE -->
+              <div class="table-responsive mb-2">
+                <table class="table table-bordered align-middle">
+                  <thead class="table-light">
+                    <tr><th colspan="2">ADMISSION SOURCE</th><th>INSTITUTIONAL</th><th>COMMUNITY</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td colspan="2">
+                        <b>Institutional</b> – Start of Care date must be within 14 days of an inpatient acute care hospital, SNF, inpatient rehab facility, inpatient psychiatric facility, or long-term care hospital discharge.<br>
+                        <b>Community</b> – Start of Care date is <b>NOT</b> within 14 days of an inpatient acute care hospital, SNF, inpatient rehab facility, inpatient psychiatric facility, or long-term care hospital discharge.<br>
+                        <span class="fw-bold">Note:</span> The second RAP for the next 30-day period within the same certification period will be COMMUNITY unless the patient went into the Hospital within the last 14 days of the Start Date of the second billing period.
+                      </td>
+                      <td><input type="radio" name="admission_source" value="institutional"></td>
+                      <td><input type="radio" name="admission_source" value="community"></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <!-- PLACE OF SERVICE -->
+              <div class="table-responsive mb-2">
+                <table class="table table-bordered align-middle">
+                  <thead class="table-light">
+                    <tr><th colspan="4">PLACE OF SERVICE: (Check appropriate box below)</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Patient's Home</td>
+                      <td>ALF: (Assisted Living Facility) Q5002</td>
+                      <td>NO: (Not Otherwise Specified) Q5009</td>
+                      <td></td>
+                    </tr>
+                    <tr>
+                      <td><input type="checkbox" name="place_home"></td>
+                      <td><input type="checkbox" name="place_alf"></td>
+                      <td><input type="checkbox" name="place_no"></td>
+                      <td></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <!-- PLAN OF CARE (485) -->
+              <div class="table-responsive mb-2">
+                <table class="table table-bordered align-middle">
+                  <thead class="table-light">
+                    <tr><th colspan="2">PLAN OF CARE (485)</th><th>YES</th><th>NO</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td colspan="2">All Sections Complete, Signed & Dated by Clinician</td>
+                      <td><input type="radio" name="plan_sections_complete" value="yes"></td>
+                      <td><input type="radio" name="plan_sections_complete" value="no"></td>
+                    </tr>
+                    <tr>
+                      <td colspan="2">Signed/Dated by Doctor</td>
+                      <td><input type="radio" name="plan_signed_doctor" value="yes"></td>
+                      <td><input type="radio" name="plan_signed_doctor" value="no"></td>
+                    </tr>
+                    <tr>
+                      <td colspan="2">Face to Face Completed and Signed by MD (if applicable)</td>
+                      <td><input type="radio" name="plan_face_to_face" value="yes"></td>
+                      <td><input type="radio" name="plan_face_to_face" value="no"></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <!-- OASIS -->
+              <div class="table-responsive mb-2">
+                <table class="table table-bordered align-middle">
+                  <thead class="table-light">
+                    <tr><th colspan="2">OASIS</th><th>YES</th><th>NO</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td colspan="2"><b>The entire set of OASIS Assessments that are collected at any point in time during a home health episode of care must be transmitted before the final is billed. Examples: Start of Care, Resumption of Care, Follow-Up (recertification or other), Transfer, Discharge and Death at Home. All OASIS must be transmitted ACCURATELY within 30 days from the date of Assessment.</b></td>
+                      <td></td><td></td>
+                    </tr>
+                    <tr>
+                      <td colspan="2">Were all Oasis transmitted?<span class="text-danger">*</span></td>
+                      <td><input type="radio" name="oasis_transmitted" value="yes" required></td>
+                      <td><input type="radio" name="oasis_transmitted" value="no" required></td>
+                    </tr>
+                    <tr>
+                      <td colspan="2">Was Validation Report Reviewed for any Warnings and/or Errors?<span class="text-danger">*</span></td>
+                      <td><input type="radio" name="oasis_validation_reviewed" value="yes" required></td>
+                      <td><input type="radio" name="oasis_validation_reviewed" value="no" required></td>
+                    </tr>
+                    <tr>
+                      <td colspan="2">If Warning/Errors found, were they fixed and a corrected Oasis retransmitted? (if applicable)</td>
+                      <td><input type="radio" name="oasis_errors_fixed" value="yes"></td>
+                      <td><input type="radio" name="oasis_errors_fixed" value="no"></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <!-- VERBAL/MODIFICATION ORDERS -->
+              <div class="table-responsive mb-2">
+                <table class="table table-bordered align-middle">
+                  <thead class="table-light">
+                    <tr><th colspan="2">VERBAL/MODIFICATION ORDERS</th><th>YES</th><th>NO</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td colspan="2">Verbal Orders Signed & Dated by Nurse<span class="text-danger">*</span></td>
+                      <td><input type="radio" name="verbal_signed_nurse" value="yes" required></td>
+                      <td><input type="radio" name="verbal_signed_nurse" value="no" required></td>
+                    </tr>
+                    <tr>
+                      <td colspan="2">Verbal Orders Signed & Dated by Doctor<span class="text-danger">*</span></td>
+                      <td><input type="radio" name="verbal_signed_doctor" value="yes" required></td>
+                      <td><input type="radio" name="verbal_signed_doctor" value="no" required></td>
+                    </tr>
+                    <tr>
+                      <td colspan="2">Mod Orders Signed & Dated by Doctor</td>
+                      <td><input type="radio" name="mod_orders_signed_doctor" value="yes"></td>
+                      <td><input type="radio" name="mod_orders_signed_doctor" value="no"></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <!-- PHYSICIAN INFORMATION -->
+              <div class="table-responsive mb-2">
+                <table class="table table-bordered align-middle">
+                  <thead class="table-light">
+                    <tr><th colspan="2">Physician Information</th><th>YES</th><th>NO</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td colspan="2">Verified Physician is on national PECOS file?<span class="text-danger">*</span></td>
+                      <td><input type="radio" name="physician_on_pecos" value="yes" required></td>
+                      <td><input type="radio" name="physician_on_pecos" value="no" required></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <!-- SERVICES -->
+              <div class="table-responsive mb-2">
+                <table class="table table-bordered align-middle">
+                  <thead class="table-light">
+                    <tr><th colspan="2">SERVICES</th><th>YES</th><th>NO</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td colspan="2">Verified that all visits in the schedule/calendar in your software match the actual visits you performed during the episode?<span class="text-danger">*</span></td>
+                      <td><input type="radio" name="services_verified" value="yes" required></td>
+                      <td><input type="radio" name="services_verified" value="no" required></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <!-- SUPPLIES -->
+              <div class="table-responsive mb-2">
+                <table class="table table-bordered align-middle">
+                  <thead class="table-light">
+                    <tr><th colspan="2">SUPPLIES</th><th>YES</th><th>NO</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td colspan="2">Wound Care Supplies Provided? (0623)</td>
+                      <td><input type="radio" name="supplies_wound_care" value="yes"></td>
+                      <td><input type="radio" name="supplies_wound_care" value="no"></td>
+                    </tr>
+                    <tr>
+                      <td colspan="2">Supplies Other Than Wound Care Provided? (0270) i.e. ostomy, foley, etc.</td>
+                      <td><input type="radio" name="supplies_other" value="yes"></td>
+                      <td><input type="radio" name="supplies_other" value="no"></td>
+                    </tr>
+                    <tr>
+                      <td colspan="2">What Was Cost of Those Supplies?</td>
+                      <td colspan="2"><input type="text" class="form-control" name="supplies_cost" placeholder="$ Cost of Supplies"></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <!-- DISPOSABLE WOUND VAC -->
+              <div class="table-responsive mb-2">
+                <table class="table table-bordered align-middle">
+                  <thead class="table-light">
+                    <tr><th colspan="2">DISPOSABLE WOUND VAC</th><th>YES</th><th>NO</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td colspan="2">Was there a Disposable Negative Pressure Wound Therapy Device Provided?</td>
+                      <td><input type="radio" name="wound_vac_provided" value="yes"></td>
+                      <td><input type="radio" name="wound_vac_provided" value="no"></td>
+                    </tr>
+                    <tr>
+                      <td colspan="2">How Many Disposable NPWT Devices Provided?</td>
+                      <td colspan="2"><input type="text" class="form-control" name="wound_vac_count" placeholder="Number of NPWT Devices"></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <!-- HOSPICE/HOSPITALIZATION -->
+              <div class="table-responsive mb-2">
+                <table class="table table-bordered align-middle">
+                  <thead class="table-light">
+                    <tr><th colspan="2">HOSPICE/HOSPITALIZATION</th><th>YES</th><th>NO</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td colspan="2">Was Patient in Hospice?</td>
+                      <td><input type="radio" name="hospice" value="yes"></td>
+                      <td><input type="radio" name="hospice" value="no"></td>
+                    </tr>
+                    <tr>
+                      <td colspan="2">Was Patient Admitted to Hospital During Episode Period? Make sure no visits are on the schedule during hospital stay</td>
+                      <td><input type="radio" name="hospitalized" value="yes"></td>
+                      <td><input type="radio" name="hospitalized" value="no"></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <!-- MSP PERIODS -->
+              <div class="table-responsive mb-2">
+                <table class="table table-bordered align-middle">
+                  <thead class="table-light">
+                    <tr><th colspan="2">MSP PERIODS</th><th>YES</th><th>NO</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td colspan="2">Is There an Open Liability Claim?<span class="text-danger">*</span></td>
+                      <td><input type="radio" name="msp_liability" value="yes" required></td>
+                      <td><input type="radio" name="msp_liability" value="no" required></td>
+                    </tr>
+                    <tr>
+                      <td colspan="2">Is There an Open No-fault Policy Claim?<span class="text-danger">*</span></td>
+                      <td><input type="radio" name="msp_nofault" value="yes" required></td>
+                      <td><input type="radio" name="msp_nofault" value="no" required></td>
+                    </tr>
+                    <tr>
+                      <td colspan="2">Is There an Open Worker's Compensation Claim?<span class="text-danger">*</span></td>
+                      <td><input type="radio" name="msp_workers_comp" value="yes" required></td>
+                      <td><input type="radio" name="msp_workers_comp" value="no" required></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <!-- Disclaimer -->
+              <div class="p-3 mb-2" style="border:1.5px solid #2986d6; border-radius:7px;">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="disclaimer" id="finalDisclaimerCheckbox">
+                  <label class="form-check-label" for="finalDisclaimerCheckbox" style="font-size:0.97rem;">
+                    The above documentation verifies that the final claim is ready for billing. Agency verifies that patient record was reviewed, and that the patient meets Medicare coverage criteria, all visits were performed, all orders have been signed by physician and chart has been reviewed for quality assurance. I authorize all visits and/or supplies listed above to be billed to Medicare.<span class="text-danger">*</span>
+                  </label>
+                </div>
+              </div>
+              <div class="text-center mt-3">
+                <button type="submit" class="btn btn-primary px-4">SUBMIT</button>
+                <button type="button" class="btn btn-secondary px-4 ms-2" onclick="window.print()">PRINT</button>
+              </div>
+            </div>
+          </form>
+        `;
+        document.getElementById('finalBillingAuditForm').onsubmit = async function(e) {
+          e.preventDefault();
+          const formData = new FormData(this);
+          const data = {};
+          formData.forEach((v, k) => data[k] = v);
+          await submitUserForm('final_billing_audit', data);
+        };
       }
-      // Add similar blocks for other forms (medicare_eligibility, home_health_billing_audit, etc.)
-    }
-    function backToDashboard() {
-      // Show dashboard, hide form
-      document.querySelector('#user-dashboard-container .dashboard-forms-list').style.display = '';
-      document.querySelector('#user-dashboard-container .dashboard-title').style.display = '';
-      document.getElementById('user-form-area').innerHTML = '';
     }
     async function submitUserForm(formType, data) {
       if (!loggedInUser) return;
