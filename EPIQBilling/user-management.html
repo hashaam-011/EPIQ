@@ -227,6 +227,95 @@
       max-width: 100%;
       margin: 0 auto;
     }
+    /* Modern full-width form styles */
+    #user-form-area .modern-form {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    }
+    .modern-form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 2rem;
+    }
+    .modern-form-field label {
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 0.5rem;
+      font-size: 1.1rem;
+    }
+    .field-row {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    .add-note-btn {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: background 0.2s;
+    }
+    .add-note-btn:hover {
+      background: #0056b3;
+    }
+    .note-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+    }
+    .note-modal-content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 600px;
+    }
+    .note-modal textarea {
+      width: 100%;
+      min-height: 120px;
+      margin: 1rem 0;
+      padding: 1rem;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+      resize: vertical;
+    }
+    .note-modal-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+    }
+    .note-modal-buttons button {
+      padding: 0.8rem 1.5rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .note-modal-buttons .save {
+      background: #28a745;
+      color: white;
+      border: none;
+    }
+    .note-modal-buttons .cancel {
+      background: #6c757d;
+      color: white;
+      border: none;
+    }
   </style>
 </head>
 <body>
@@ -1035,42 +1124,79 @@
       const area = document.getElementById('user-form-area');
       if (formType === 'outpatient_therapy') {
         area.innerHTML = `
-          <form id="outpatientTherapyForm" class="mb-4">
+          <form id="outpatientTherapyForm" class="modern-form">
             <h5 class="mb-3">Outpatient Therapy Medicare Ready To Bill</h5>
-            <div class="table-responsive mb-3">
-              <table class="table table-bordered">
-                <thead class="table-light">
-                  <tr>
-                    <th>#</th>
-                    <th>Patient First Name</th>
-                    <th>Patient Last Name</th>
-                    <th>Date From</th>
-                    <th>Date To</th>
-                    <th>Therapist First Name</th>
-                    <th>Therapist Last Name</th>
-                    <th>NPI</th>
-                    <th>Specialty</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${[1,2,3,4,5,6,7,8].map(i => `
-                    <tr>
-                      <td>${i}</td>
-                      <td><input type='text' class='form-control' name='patient_first_name_${i}'></td>
-                      <td><input type='text' class='form-control' name='patient_last_name_${i}'></td>
-                      <td><input type='date' class='form-control' name='date_from_${i}'></td>
-                      <td><input type='date' class='form-control' name='date_to_${i}'></td>
-                      <td><input type='text' class='form-control' name='therapist_first_name_${i}'></td>
-                      <td><input type='text' class='form-control' name='therapist_last_name_${i}'></td>
-                      <td><input type='text' class='form-control' name='npi_${i}'></td>
-                      <td><input type='text' class='form-control' name='specialty_${i}'></td>
-                    </tr>
-                  `).join('')}
-                </tbody>
-              </table>
+            <div class="modern-form-grid">
+              <div class="modern-form-field">
+                <label>Patient First Name</label>
+                <div class="field-row">
+                  <input type="text" class="form-control" name="patient_first_name" required>
+                  <button type="button" class="add-note-btn" onclick="showNoteModal('patient_first_name')">Add Note</button>
+                </div>
+              </div>
+              <div class="modern-form-field">
+                <label>Patient Last Name</label>
+                <div class="field-row">
+                  <input type="text" class="form-control" name="patient_last_name" required>
+                  <button type="button" class="add-note-btn" onclick="showNoteModal('patient_last_name')">Add Note</button>
+                </div>
+              </div>
+              <div class="modern-form-field">
+                <label>Date From</label>
+                <div class="field-row">
+                  <input type="date" class="form-control" name="date_from" required>
+                  <button type="button" class="add-note-btn" onclick="showNoteModal('date_from')">Add Note</button>
+                </div>
+              </div>
+              <div class="modern-form-field">
+                <label>Date To</label>
+                <div class="field-row">
+                  <input type="date" class="form-control" name="date_to" required>
+                  <button type="button" class="add-note-btn" onclick="showNoteModal('date_to')">Add Note</button>
+                </div>
+              </div>
+              <div class="modern-form-field">
+                <label>Therapist First Name</label>
+                <div class="field-row">
+                  <input type="text" class="form-control" name="therapist_first_name" required>
+                  <button type="button" class="add-note-btn" onclick="showNoteModal('therapist_first_name')">Add Note</button>
+                </div>
+              </div>
+              <div class="modern-form-field">
+                <label>Therapist Last Name</label>
+                <div class="field-row">
+                  <input type="text" class="form-control" name="therapist_last_name" required>
+                  <button type="button" class="add-note-btn" onclick="showNoteModal('therapist_last_name')">Add Note</button>
+                </div>
+              </div>
+              <div class="modern-form-field">
+                <label>NPI</label>
+                <div class="field-row">
+                  <input type="text" class="form-control" name="npi" required>
+                  <button type="button" class="add-note-btn" onclick="showNoteModal('npi')">Add Note</button>
+                </div>
+              </div>
+              <div class="modern-form-field">
+                <label>Specialty</label>
+                <div class="field-row">
+                  <input type="text" class="form-control" name="specialty" required>
+                  <button type="button" class="add-note-btn" onclick="showNoteModal('specialty')">Add Note</button>
+                </div>
+              </div>
             </div>
-            <button type="submit" class="btn btn-success">Submit Outpatient Therapy Form</button>
+            <button type="submit" class="btn btn-success w-100 mt-4">Submit</button>
           </form>
+          <!-- Note Modal -->
+          <div id="noteModal" class="note-modal" style="display:none;">
+            <div class="note-modal-content">
+              <h3>Add Note</h3>
+              <textarea id="modalNoteText" placeholder="Enter your note here..."></textarea>
+              <div class="note-modal-buttons">
+                <button class="cancel" onclick="closeNoteModal()">Cancel</button>
+                <button class="save" onclick="saveNote()">Save Note</button>
+              </div>
+            </div>
+          </div>
         `;
         document.getElementById('outpatientTherapyForm').onsubmit = async function(e) {
           e.preventDefault();
@@ -1767,6 +1893,25 @@
         formDiv.classList.remove('show');
       } else {
         formDiv.classList.add('show');
+      }
+    }
+    // Modal logic for notes
+    let currentFieldId = null;
+    function showNoteModal(fieldId) {
+      currentFieldId = fieldId;
+      document.getElementById('noteModal').style.display = 'block';
+      document.getElementById('modalNoteText').value = '';
+    }
+    function closeNoteModal() {
+      document.getElementById('noteModal').style.display = 'none';
+      currentFieldId = null;
+    }
+    function saveNote() {
+      const noteText = document.getElementById('modalNoteText').value;
+      if (noteText.trim()) {
+        // You can implement saving the note to localStorage or backend as needed
+        alert('Note for ' + currentFieldId + ': ' + noteText);
+        closeNoteModal();
       }
     }
   </script>
