@@ -54,15 +54,79 @@
     }
     .popup-content {
       background: white;
-      padding: 20px;
-      border-radius: 5px;
+      padding: 30px;
+      border-radius: 10px;
       width: 90%;
-      max-width: 500px;
+      max-width: 600px;
+      max-height: 80vh;
+      overflow-y: auto;
+      position: relative;
+    }
+    .popup-close {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 24px;
+      cursor: pointer;
+      color: #666;
+    }
+    .popup-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .popup-buttons button {
+      padding: 8px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      border: none;
+      font-weight: 500;
+    }
+    .popup-buttons .accept {
+      background: #0d6efd;
+      color: white;
+    }
+    .popup-buttons .decline {
+      background: #dc3545;
+      color: white;
+    }
+    .popup-links {
+      margin: 15px 0;
+    }
+    .popup-links a {
+      color: #0d6efd;
+      text-decoration: none;
+      margin-right: 15px;
+    }
+    .popup-links a:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
 
 <body class="index-page">
+
+  <!-- Terms and Conditions Popup -->
+  <div id="termsPopup" class="popup" style="display: none;">
+    <div class="popup-content">
+      <span class="popup-close" onclick="closeTermsPopup()">&times;</span>
+      <h2>Welcome to EPIQ Billing Solutions</h2>
+      <p>Please review our Terms and Conditions and Privacy Policy before proceeding.</p>
+
+      <div class="popup-links">
+        <a href="terms.html" target="_blank">Terms and Conditions</a>
+        <a href="privacy.html" target="_blank">Privacy Policy</a>
+      </div>
+
+      <p>By clicking "Accept", you agree to our Terms and Conditions and Privacy Policy.</p>
+
+      <div class="popup-buttons">
+        <button class="decline" onclick="declineTerms()">Decline</button>
+        <button class="accept" onclick="acceptTerms()">Accept</button>
+      </div>
+    </div>
+  </div>
 
   <header id="header" class="header d-flex align-items-center fixed-top">
     <div class="container-fluid container-xl position-relative d-flex align-items-center">
@@ -399,27 +463,6 @@ Our mission is to empower healthcare providers by streamlining billing operation
 
   <!-- Main JS File -->
   <script src="assets/js/main.js"></script>
-
-  <!-- Landing Popup -->
-  <div id="landing-popup" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center;">
-    <div style="background:#fff; border-radius:12px; box-shadow:0 8px 30px rgba(0,0,0,0.15); padding:32px 24px; max-width:350px; width:90%; text-align:center;">
-      <h3 style="color:#4b3bff; font-weight:600; margin-bottom:18px;">Welcome to EPIQ Billing Solutions</h3>
-      <p style="margin-bottom:24px; color:#374151;">For secure access, please login to your account.</p>
-      <button id="landing-login-btn" class="btn btn-primary w-100">Login</button>
-    </div>
-  </div>
-  <script>
-    // Landing popup logic
-    window.addEventListener('DOMContentLoaded', function() {
-      const popup = document.getElementById('landing-popup');
-      popup.style.display = 'flex';
-      const timer = setTimeout(() => { popup.style.display = 'none'; }, 4000);
-      document.getElementById('landing-login-btn').onclick = function() {
-        clearTimeout(timer);
-        window.location.href = 'user-management.html';
-      };
-    });
-  </script>
 
 </body>
 

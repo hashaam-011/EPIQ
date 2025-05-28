@@ -37,6 +37,7 @@ CREATE TABLE IF NOT EXISTS form_submissions (
     user_id INTEGER REFERENCES users(id),
     form_type VARCHAR(50) NOT NULL,
     form_data JSONB NOT NULL,
+    notes TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     status VARCHAR(20) DEFAULT 'final'
 );
