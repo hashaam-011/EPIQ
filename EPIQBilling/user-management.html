@@ -989,7 +989,6 @@
         if (data.success) {
           let html = `
             <div class="container-fluid px-4 py-4 dashboard-container">
-              <!-- Navigation Bar -->
               <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
                 <div class="container-fluid">
                   <a class="navbar-brand" href="#">
@@ -1001,12 +1000,10 @@
                   </div>
                 </div>
               </nav>
-              <!-- Dashboard Header -->
               <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2 class="mb-0">Admin Dashboard</h2>
                 <button class="btn btn-primary" onclick="toggleCreateForm('user')">Create New User</button>
               </div>
-              <!-- Create User Form -->
               <div id="slideDownCreateForm" class="slide-down-form">
                 <form id="createUserForm">
                   <div class="form-group mb-3">
@@ -1028,35 +1025,6 @@
                   <button type="submit" class="btn btn-info">Create User</button>
                 </form>
               </div>
-              <!-- Stats Cards -->
-              <div class="row mb-4">
-                <div class="col-md-4">
-                  <div class="card bg-primary text-white stat-card">
-                    <div class="card-body">
-                      <h5 class="card-title">Total Users</h5>
-                      <h2 class="mb-0">${data.users.length}</h2>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-4">
-                  <div class="card bg-success text-white stat-card">
-                    <div class="card-body">
-                      <h5 class="card-title">Total Forms</h5>
-                      <h2 class="mb-0">${data.users.reduce((acc, user) => acc + (user.forms?.length || 0), 0)}</h2>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-4">
-                  <div class="card bg-info text-white stat-card">
-                    <div class="card-body">
-                      <h5 class="card-title">Active Users</h5>
-                      <h2 class="mb-0">${data.users.filter(u => u.status === 'active').length}</h2>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Main Content -->
               <div class="row">
                 <div class="col-12">
                   <div class="card">
@@ -1068,9 +1036,10 @@
                         <table class="table table-hover mb-0">
                           <thead class="table-light">
                             <tr>
-                              <th style="width: 40px"></th>
+                              <th></th>
                               <th>User Name</th>
                               <th>Email</th>
+                              <th>Last Login</th>
                               <th>Forms</th>
                               <th class="text-end">Actions</th>
                             </tr>
@@ -1081,26 +1050,16 @@
             const formCount = user.forms?.length || 0;
             html += `
               <tr>
-                <td>
-                  <button class="btn btn-sm btn-link" onclick="toggleFormList('user${user.id}')">
-                    <i class="bi bi-chevron-down"></i>
-                  </button>
-                </td>
+                <td><button class="btn btn-sm btn-link" onclick="toggleFormList('user${user.id}')"><i class="bi bi-chevron-down"></i></button></td>
                 <td>${user.first_name} ${user.last_name}</td>
                 <td>${user.email}</td>
+                <td>${user.last_login ? new Date(user.last_login).toLocaleString() : 'Never'}</td>
                 <td>${formCount}</td>
-                <td class="text-end">
-                  <button class="btn btn-sm btn-primary me-1" onclick="editUser('${user.id}')">
-                    <i class="bi bi-pencil"></i> Edit
-                  </button>
-                  <button class="btn btn-sm btn-danger" onclick="deleteUser('${user.id}')">
-                    <i class="bi bi-trash"></i> Delete
-                  </button>
-                </td>
+                <td class="text-end"></td>
               </tr>
               <tr id="user${user.id}" style="display: none;">
-                <td colspan="5" class="p-0">
-                  <div class="bg-light p-3">
+                <td colspan="6" class="p-0">
+                  <div class="bg-white p-3">
                     <h6 class="mb-3">Forms</h6>
                     <div class="table-responsive">
                       <table class="table table-sm table-bordered mb-0">
@@ -1113,89 +1072,47 @@
                           </tr>
                         </thead>
                         <tbody>`;
-
-            if (!user.forms || user.forms.length === 0) {
-              html += `<tr><td colspan="4" class="text-muted">No forms submitted</td></tr>`;
-            } else {
-              user.forms.forEach(form => {
-                html += `
-                  <tr>
-                    <td>${form.form_type}</td>
-                    <td><span class="badge ${form.status === 'final' ? 'bg-success' : 'bg-warning text-dark'}">${form.status}</span></td>
-                    <td>${new Date(form.created_at).toLocaleString()}</td>
-                    <td class="text-end">
-                      <button class="btn btn-sm btn-primary me-1" onclick="editForm('${form.id}')">
-                        <i class="bi bi-pencil"></i> Edit
-                      </button>
-                      <button class="btn btn-sm btn-danger" onclick="deleteForm('${form.id}')">
-                        <i class="bi bi-trash"></i> Delete
-                      </button>
-                    </td>
-                  </tr>`;
-              });
-            }
-
+        if (!user.forms || user.forms.length === 0) {
+          html += `<tr><td colspan="4" class="text-muted">No forms submitted</td></tr>`;
+        } else {
+          user.forms.forEach(form => {
             html += `
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
+              <tr>
+                <td>${form.form_type}</td>
+                <td><span class="badge ${form.status === 'final' ? 'bg-success' : 'bg-warning text-dark'}">${form.status}</span></td>
+                <td>${new Date(form.created_at).toLocaleString()}</td>
+                <td class="text-end">
+                  <button class="btn btn-sm btn-primary me-1" onclick="editFormModal('${form.id}')"><i class="bi bi-pencil"></i> Edit</button>
                 </td>
               </tr>`;
           });
-
-          html += `
+        }
+        html += `
                     </tbody>
                   </table>
                 </div>
               </div>
-            </div>`;
-
-          dash.innerHTML = html;
-          // Add event listener for the create user form
-          document.getElementById('createUserForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            if (!loggedInUser || loggedInUser.role !== 'admin') {
-              alert('Only admin can create users.');
-              return;
-            }
-            const first_name = document.getElementById('user-first-name').value;
-            const last_name = document.getElementById('user-last-name').value;
-            const email = document.getElementById('user-email').value;
-            const password = document.getElementById('user-password').value;
-            try {
-              const response = await fetch('http://localhost:3000/api/create-user', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  creator_role: loggedInUser.role,
-                  creator_id: loggedInUser.id,
-                  first_name,
-                  last_name,
-                  email,
-                  password
-                })
-              });
-              const data = await response.json();
-              if (data.success) {
-                showLoginFeedback('User created successfully!', true);
-                document.getElementById('createUserForm').reset();
-                toggleCreateForm('user');
-                loadAdminDashboard(loggedInUser.id);
-              } else {
-                showLoginFeedback('Failed to create user: ' + data.message, false);
-              }
-            } catch (err) {
-              showLoginFeedback('Server error. Please try again later.', false);
-            }
-          });
-        } else {
-          dash.innerHTML = '<div class="text-danger">Failed to load users and forms.</div>';
-        }
-      } catch (err) {
-        dash.innerHTML = '<div class="text-danger">Server error loading users and forms.</div>';
-      }
+            </td>
+          </tr>`;
+      });
+      html += `
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>`;
+      dash.innerHTML = html;
+      // Add event listeners for modals and actions here...
+    } else {
+      dash.innerHTML = '<div class="text-danger">Failed to load users and forms.</div>';
     }
+  } catch (err) {
+    dash.innerHTML = '<div class="text-danger">Server error loading users and forms.</div>';
+  }
+}
     function showForm(formType) {
       const area = document.getElementById('user-form-area');
       if (formType === 'outpatient_therapy') {
@@ -2193,6 +2110,14 @@
     }
     // Call these after rendering forms
     setTimeout(() => { patchCreateAdminFormValidation(); patchCreateUserFormValidation(); }, 1000);
+  </script>
+  <script>
+    window.moveUserModal = moveUserModal;
+    window.editUserModal = editUserModal;
+    window.deleteUserModal = deleteUserModal;
+    window.saveMoveUser = saveMoveUser;
+    window.saveUserAdminEdit = saveUserAdminEdit;
+    window.editFormModal = editFormModal;
   </script>
 </body>
 </html>
