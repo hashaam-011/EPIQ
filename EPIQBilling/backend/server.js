@@ -178,34 +178,97 @@ app.post('/api/submit-data', async (req, res) => {
 // API endpoint for superadmin to create admin
 app.post('/api/create-admin', async (req, res) => {
   const { creator_role, first_name, last_name, email, password } = req.body;
+
+  // Validate creator role
   if (creator_role !== 'superadmin') {
     return res.status(403).json({ success: false, message: 'Only superadmin can create admins.' });
   }
+
+  // Validate required fields
+  if (!first_name || !last_name || !email || !password) {
+    return res.status(400).json({ success: false, message: 'All fields are required.' });
+  }
+
   try {
+    // Check if email already exists
+    const existingUser = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    if (existingUser.rows.length > 0) {
+      return res.status(400).json({ success: false, message: 'Email already exists.' });
+    }
+
+    // Create admin
     const result = await pool.query(
       'INSERT INTO users (first_name, last_name, email, password, role) VALUES ($1, $2, $3, $4, $5) RETURNING *',
       [first_name, last_name, email, password, 'admin']
     );
-    res.json({ success: true, user: result.rows[0] });
+
+    // Return success response
+    return res.status(201).json({
+      success: true,
+      message: 'Admin created successfully',
+      user: result.rows[0]
+    });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Error creating admin.' });
+    console.error('Error creating admin:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Error creating admin. Please try again.'
+    });
   }
 });
 
 // API endpoint for admin to create user (limit 4 per admin)
 app.post('/api/create-user', async (req, res) => {
   const { creator_role, creator_id, first_name, last_name, email, password } = req.body;
+
+  // Validate creator role
   if (creator_role !== 'admin') {
     return res.status(403).json({ success: false, message: 'Only admin can create users.' });
   }
+
+  // Validate required fields
+  if (!first_name || !last_name || !email || !password || !creator_id) {
+    return res.status(400).json({ success: false, message: 'All fields are required.' });
+  }
+
   try {
+    // Check if email already exists
+    const existingUser = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    if (existingUser.rows.length > 0) {
+      return res.status(400).json({ success: false, message: 'Email already exists.' });
+    }
+
+    // Check user limit for admin (4 users max)
+    const userCount = await pool.query(
+      'SELECT COUNT(*) FROM users WHERE created_by = $1 AND role = $2',
+      [creator_id, 'user']
+    );
+
+    if (parseInt(userCount.rows[0].count) >= 4) {
+      return res.status(400).json({
+        success: false,
+        message: 'Maximum user limit (4) reached for this admin.'
+      });
+    }
+
+    // Create user
     const result = await pool.query(
       'INSERT INTO users (first_name, last_name, email, password, role, created_by) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
       [first_name, last_name, email, password, 'user', creator_id]
     );
-    res.json({ success: true, user: result.rows[0] });
+
+    // Return success response
+    return res.status(201).json({
+      success: true,
+      message: 'User created successfully',
+      user: result.rows[0]
+    });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Error creating user.' });
+    console.error('Error creating user:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Error creating user. Please try again.'
+    });
   }
 });
 
