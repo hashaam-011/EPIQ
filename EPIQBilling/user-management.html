@@ -1819,50 +1819,39 @@
       }
     }
     async function deleteUser(userId) {
+      if (!confirm('Are you sure you want to delete this user/admin?')) return;
+
       const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
-      if (!loggedInUser) {
-        alert('You are not logged in. Please log in again.');
+      if (!loggedInUser || loggedInUser.role !== 'superadmin') {
+        alert('You must be logged in as a super admin to delete users/admins.');
         return;
       }
-      if (!confirm('Are you sure you want to delete this user?')) return;
-      const body = {
-        admin_id: loggedInUser.id,
-        user_role: loggedInUser.role
-      };
-      console.log('Deleting user', userId, 'with payload', body);
-      try {
-        // Delete user's forms first
-        await fetch(`http://localhost:3000/api/form/user/${userId}`, {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body)
-        });
-        // Delete user's submissions (the other table causing the error)
-        await fetch(`http://localhost:3000/api/submissions/user/${userId}`, {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body)
-        });
-        // Then delete the user
-        const response = await fetch(`http://localhost:3000/api/user/${userId}`, {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body)
-        });
-        const data = await response.json();
-        if (data.success) {
-          alert('User deleted successfully.');
-          if (loggedInUser.role === 'superadmin') {
-            loadSuperAdminDashboard();
-          } else if (loggedInUser.role === 'admin') {
-            loadAdminDashboard(loggedInUser.id);
+
+      fetch(`http://localhost:3000/api/superadmin/user/${userId}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          admin_id: loggedInUser.id,
+          user_role: loggedInUser.role
+        })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            showLoginFeedback('User/Admin deleted successfully!', true);
+            // Ensure we're still logged in as superadmin
+            if (loggedInUser && loggedInUser.role === 'superadmin') {
+              loadSuperAdminDashboard();
+            } else {
+              window.location.reload(); // If session is lost, reload the page
+            }
+          } else {
+            alert(data.message || 'Error deleting user/admin');
           }
-        } else {
-          alert(data.message || 'Error deleting user.');
-        }
-      } catch (err) {
-        alert('Error deleting user.');
-      }
+        })
+        .catch(err => {
+          alert('Error deleting user/admin. Please try again.');
+        });
     }
     function toggleUserList(id) {
       const row = document.getElementById(id);
@@ -2069,22 +2058,64 @@
     function patchCreateAdminFormValidation() {
       const form = document.getElementById('createAdminForm');
       if (!form) return;
-      form.addEventListener('submit', function(e) {
+      form.addEventListener('submit', async function(e) {
+        e.preventDefault();
         clearFormError(form);
         const first = form.querySelector('#admin-first-name').value.trim();
         const last = form.querySelector('#admin-last-name').value.trim();
         const email = form.querySelector('#admin-email').value.trim();
         const password = form.querySelector('#admin-password').value;
+
         if (!validateName(first)) {
-          e.preventDefault(); showFormError(form, 'First name must be 2-30 characters.'); return false;
+          showFormError(form, 'First name must be 2-30 characters.'); return false;
         }
         if (last && !validateName(last)) {
-          e.preventDefault(); showFormError(form, 'Last name must be 2-30 characters.'); return false;
+          showFormError(form, 'Last name must be 2-30 characters.'); return false;
         }
         if (!validatePassword(password)) {
-          e.preventDefault(); showFormError(form, 'Password must be at least 8 characters and contain a special character.'); return false;
+          showFormError(form, 'Password must be at least 8 characters and contain a special character.'); return false;
         }
-        // Email is already validated by browser, but can add regex if needed
+
+        try {
+          const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+          if (!loggedInUser || loggedInUser.role !== 'superadmin') {
+            showFormError(form, 'You must be logged in as a super admin to create admins.');
+            return false;
+          }
+
+          const response = await fetch('http://localhost:3000/api/create-admin', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${loggedInUser.id}` // Add authorization header
+            },
+            body: JSON.stringify({
+              creator_role: loggedInUser.role,
+              first_name: first,
+              last_name: last,
+              email: email,
+              password: password
+            })
+          });
+
+          const data = await response.json();
+          if (data.success) {
+            showLoginFeedback('Admin created successfully!', true);
+            form.reset();
+            toggleCreateForm('admin'); // Hide the form
+
+            // Refresh the dashboard without reloading the page
+            await loadSuperAdminDashboard();
+
+            // Update the loggedInUser in localStorage to maintain session
+            localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
+          } else {
+            showFormError(form, data.message || 'Error creating admin.');
+          }
+        } catch (err) {
+          console.error('Error creating admin:', err);
+          showFormError(form, 'Server error. Please try again.');
+        }
       }, true);
     }
     // Patch createUserForm submit
